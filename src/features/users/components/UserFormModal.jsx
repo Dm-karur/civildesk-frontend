@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { User, Save, X, Loader2, Key } from 'lucide-react';
+import { User, Save, X, Loader2, Key, Shield } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
-import { usersApi, branchesApi } from '../../../api/apiservice';
+import { usersApi, branchesApi, rolesApi } from '../../../api/apiservice';
 import { toast } from '../../../components/composite/Toast';
 
 export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   const isEditing = Boolean(user?.id);
   const [saving, setSaving] = useState(false);
   const [branches, setBranches] = useState([]);
+  const [roles, setRoles] = useState([]);
 
   const [formData, setFormData] = useState({
     employee_code: '',
@@ -19,6 +20,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
     password: '',
     designation: 'Site Engineer',
     user_type_id: '2',
+    access_level_id: '2', // Default: 2 (Company / Branch Level)
     user_status_id: '1',
     default_branch_id: '',
     is_super_admin: 0,
@@ -28,10 +30,18 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   });
 
   useEffect(() => {
+    // Load branches & roles for dropdowns
     branchesApi.list()
       .then(res => {
         const list = res?.data || res || [];
         if (Array.isArray(list)) setBranches(list);
+      })
+      .catch(() => {});
+
+    rolesApi.list()
+      .then(res => {
+        const list = res?.data || res || [];
+        if (Array.isArray(list)) setRoles(list);
       })
       .catch(() => {});
   }, []);
@@ -48,6 +58,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
         password: '',
         designation: user.designation || 'Site Engineer',
         user_type_id: String(user.user_type_id || '2'),
+        access_level_id: String(user.access_level_id || (user.is_super_admin ? '1' : '2')),
         user_status_id: String(user.user_status_id || '1'),
         default_branch_id: user.default_branch_id || '',
         is_super_admin: user.is_super_admin ? 1 : 0,
@@ -66,11 +77,12 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
         password: '',
         designation: 'Site Engineer',
         user_type_id: '2',
+        access_level_id: '2',
         user_status_id: '1',
         default_branch_id: '',
         is_super_admin: 0,
         is_active: 1,
-        must_change_password: 1,
+        must_change_password: 0,
         company_id: '1'
       });
     }
@@ -80,6 +92,16 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    if (name === 'is_super_admin') {
+      const isSuper = checked ? 1 : 0;
+      setFormData(prev => ({
+        ...prev,
+        is_super_admin: isSuper,
+        access_level_id: isSuper ? '1' : prev.access_level_id
+      }));
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? (checked ? 1 : 0) : value
@@ -91,18 +113,38 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
     setSaving(true);
 
     try {
+      // Build clean payload with access_level_id and typed fields
+      const payload = {
+        ...formData,
+        access_level_id: Number(formData.access_level_id) || (formData.is_super_admin ? 1 : 2),
+        user_type_id: Number(formData.user_type_id) || 2,
+        user_status_id: Number(formData.user_status_id) || 1,
+        company_id: Number(formData.company_id) || 1,
+        default_branch_id: formData.default_branch_id ? Number(formData.default_branch_id) : null,
+        is_super_admin: formData.is_super_admin ? 1 : 0,
+        is_active: Number(formData.is_active),
+        active: Number(formData.is_active),
+        must_change_password: Number(formData.must_change_password)
+      };
+
+      // Don't send empty password when editing existing user
+      if (isEditing && !payload.password) {
+        delete payload.password;
+      }
+
       if (isEditing) {
-        await usersApi.update(user.id, formData);
+        await usersApi.update(user.id, payload);
         toast.success('User updated successfully');
       } else {
-        await usersApi.create(formData);
+        await usersApi.create(payload);
         toast.success('User created successfully');
       }
       onSaveSuccess();
       onClose();
     } catch (err) {
       console.error('Failed to save user:', err);
-      toast.error(err?.message || 'Failed to save user.');
+      const errorMsg = err?.response?.data?.message || err?.message || 'Failed to save user. Check required fields.';
+      toast.error(errorMsg);
     } finally {
       setSaving(false);
     }
@@ -227,7 +269,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
                   onChange={handleChange}
                   className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                 >
-                  <option value="">All / Head Office</option>
+                  <option value="">All Branches / Head Office</option>
                   {branches.map(br => (
                     <option key={br.id} value={br.id}>
                       {br.branch_name || br.name} ({br.branch_code || br.code})
@@ -243,8 +285,26 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
               3. Security & Access Control
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {!isEditing && (
-                <div className="sm:col-span-2">
+              <div>
+                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
+                  Access Level (Permission Level) *
+                </label>
+                <select
+                  name="access_level_id"
+                  value={formData.access_level_id}
+                  onChange={handleChange}
+                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-medium focus:outline-none focus:border-focus"
+                  required
+                >
+                  <option value="1">Level 1 - Super Administrator</option>
+                  <option value="2">Level 2 - Company Admin</option>
+                  <option value="3">Level 3 - Branch / Project Manager</option>
+                  <option value="4">Level 4 - Site Engineer / Staff</option>
+                </select>
+              </div>
+
+              {!isEditing ? (
+                <div>
                   <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Password *</label>
                   <input 
                     type="password"
@@ -253,10 +313,23 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
                     onChange={handleChange}
                     placeholder="Enter password..."
                     className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
-                    required={!isEditing}
+                    required
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">New Password (optional)</label>
+                  <input 
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Leave blank to keep existing password"
+                    className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                   />
                 </div>
               )}
+
               <div className="flex items-center gap-4 sm:col-span-2 pt-1">
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <input 
@@ -266,7 +339,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
                     onChange={handleChange}
                     className="rounded-xs text-primary"
                   />
-                  <span className="text-[10px] font-medium text-text-primary">Super Administrator Access</span>
+                  <span className="text-[10px] font-medium text-text-primary">Super Administrator</span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <input 
