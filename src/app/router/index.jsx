@@ -3,6 +3,7 @@ import { AppShell } from '../../components/layout';
 import { DashboardPage } from '../../features/dashboard/pages/DashboardPage';
 import { LoginPage } from '../../features/auth/pages/LoginPage';
 import { ProjectsListPage } from '../../features/projects/pages/ProjectsListPage';
+import { ClientsListPage } from '../../features/clients/pages/ClientsListPage';
 import { CompanyBranchPage } from '../../features/settings/pages/CompanyBranchPage';
 import { AuthProvider } from '../../features/auth/context/AuthContext';
 import { ProtectedRoute } from '../../components/layout/ProtectedRoute';
@@ -40,6 +41,14 @@ export const router = createBrowserRouter([
               {
                 path: 'projects',
                 element: <ProjectsListPage />,
+              },
+              {
+                path: 'project-masters/clients',
+                element: <ClientsListPage />,
+              },
+              {
+                path: 'clients',
+                element: <Navigate to="/project-masters/clients" replace />,
               },
               {
                 path: 'settings/company-branch',
