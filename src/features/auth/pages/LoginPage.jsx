@@ -59,9 +59,10 @@ export function LoginPage() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="h-[100dvh] overflow-hidden flex w-full bg-[#F8F9FC] font-sans">
-      {/* Left Panel - Hidden on smaller screens */}
-      <div className="hidden lg:flex relative w-1/2 flex-col overflow-hidden">
+    <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[#E5E7EB] p-4 sm:p-6 lg:p-8 font-sans">
+      <div className="flex w-full h-[calc(100dvh-32px)] sm:h-[calc(100dvh-48px)] lg:h-[calc(100dvh-64px)] max-w-[1600px] bg-[#F8F9FC] rounded-[20px] overflow-hidden shadow-2xl relative">
+        {/* Left Panel - Hidden on smaller screens */}
+        <div className="hidden lg:flex relative w-1/2 flex-col overflow-hidden">
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -211,6 +212,7 @@ export function LoginPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
