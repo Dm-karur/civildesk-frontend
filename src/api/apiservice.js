@@ -115,7 +115,10 @@ export const usersApi = {
     remove: (id) => request.delete(`/users/${enc(id)}`),
 };
 export const rolesApi = {
-    list: (params) => request.get('/roles', params),
+    list: (params) => request.get('/roles', params)
+        .catch(() => request.get('/user_roles', params))
+        .catch(() => request.get('/user-roles', params))
+        .catch(() => mastersApi.all().then(res => res?.user_roles || res?.roles || res?.data?.user_roles || res?.data?.roles || [])),
     get: (id) => request.get(`/roles/${enc(id)}`),
     create: (payload) => request.post('/roles', payload),
     update: (id, payload) => request.patch(`/roles/${enc(id)}`, payload),

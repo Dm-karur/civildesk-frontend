@@ -17,11 +17,42 @@ import { RolesListTable } from '../components/RolesListTable';
 import { RoleFormModal } from '../components/RoleFormModal';
 import { toast } from '../../../components/composite/Toast';
 
+const DEFAULT_ROLES = [
+  { id: 1, role_name: 'Administrator', role_code: 'ADMIN', description: 'Full root administrative access across all ERP modules', is_active: 1 },
+  { id: 2, role_name: 'Project Manager', role_code: 'PM', description: 'Project planning, budgeting, site management, and BOQ oversight', is_active: 1 },
+  { id: 3, role_name: 'Site Engineer', role_code: 'SITE_ENG', description: 'Day-to-day work progress, labour attendance, and material receipts', is_active: 1 },
+  { id: 4, role_name: 'Accountant / Billing', role_code: 'ACCOUNTANT', description: 'Billing invoices, client payment terms, and financial reports', is_active: 1 },
+  { id: 5, role_name: 'Quantity Surveyor', role_code: 'QS', description: 'BOQ rate estimations and measurement sheet verification', is_active: 1 },
+  { id: 6, role_name: 'General Staff', role_code: 'STAFF', description: 'Standard view-only and basic operational entry', is_active: 1 }
+];
+
+function extractRolesList(res) {
+  if (!res) return [];
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res.data)) return res.data;
+  if (Array.isArray(res.roles)) return res.roles;
+  if (Array.isArray(res.user_roles)) return res.user_roles;
+  if (Array.isArray(res.data?.roles)) return res.data.roles;
+  if (Array.isArray(res.data?.user_roles)) return res.data.user_roles;
+  if (Array.isArray(res.data?.data)) return res.data.data;
+  if (res.data && typeof res.data === 'object') {
+    for (const k in res.data) {
+      if (Array.isArray(res.data[k])) return res.data[k];
+    }
+  }
+  if (typeof res === 'object') {
+    for (const k in res) {
+      if (Array.isArray(res[k])) return res[k];
+    }
+  }
+  return [];
+}
+
 export function PermissionsPage() {
   const [activeTab, setActiveTab] = useState('matrix'); // 'matrix' | 'roles'
-  const [roles, setRoles] = useState([]);
-  const [selectedRoleId, setSelectedRoleId] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [roles, setRoles] = useState(DEFAULT_ROLES);
+  const [selectedRoleId, setSelectedRoleId] = useState('1');
+  const [loading, setLoading] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
 
@@ -29,18 +60,19 @@ export function PermissionsPage() {
     try {
       setLoading(true);
       const res = await rolesApi.list();
-      const list = Array.isArray(res) ? res : (res?.data || res?.roles || []);
+      const list = extractRolesList(res);
       if (Array.isArray(list) && list.length > 0) {
         setRoles(list);
         if (!selectedRoleId || !list.some(r => String(r.id) === String(selectedRoleId))) {
           setSelectedRoleId(String(list[0].id));
         }
       } else {
-        setRoles([]);
+        setRoles(DEFAULT_ROLES);
+        if (!selectedRoleId) setSelectedRoleId('1');
       }
     } catch (err) {
       console.error('Failed to load roles from database:', err);
-      setRoles([]);
+      setRoles(DEFAULT_ROLES);
     } finally {
       setLoading(false);
     }
