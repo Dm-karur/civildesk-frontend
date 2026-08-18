@@ -87,6 +87,13 @@ export function UserDetailModal({ user, onClose }) {
           </div>
         </div>
 
+        {/* Inactive Account Warning Banner */}
+        {!isActive && (
+          <div className="bg-rose-500/10 border-b border-rose-500/20 px-4 py-2 text-[11px] text-rose-700 dark:text-rose-400">
+            ⚠️ <strong>Account Inactive:</strong> This user profile is inactive. System access, branch operations, and authentication are suspended.
+          </div>
+        )}
+
         {/* Modal Body */}
         <div className="p-4 text-[11px] space-y-3 max-h-[82vh] overflow-y-auto">
           {/* Section 1: User Identity & Role */}

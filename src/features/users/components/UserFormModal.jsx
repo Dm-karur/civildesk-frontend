@@ -272,11 +272,34 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
             <h3 className="text-[13px] font-bold text-text-primary">
               {isEditing ? `Edit User: ${user.first_name || user.username}` : 'Add New User'}
             </h3>
+            {isEditing && (
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                formData.is_active === 1 
+                  ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
+                  : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
+              }`}>
+                {formData.is_active === 1 ? 'Active User' : 'Inactive User'}
+              </span>
+            )}
           </div>
           <button onClick={onClose} className="text-text-secondary hover:text-text-primary p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Inactive Account Banner */}
+        {formData.is_active === 0 && (
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-[11px] text-amber-700 dark:text-amber-400 flex items-center justify-between">
+            <span>⚠️ <strong>Account Inactive:</strong> This user cannot log in or make updates while inactive.</span>
+            <button 
+              type="button" 
+              onClick={() => setFormData(prev => ({ ...prev, is_active: 1, user_status_id: '1' }))}
+              className="text-[10px] font-bold underline hover:no-underline ml-2"
+            >
+              Reactivate Now
+            </button>
+          </div>
+        )}
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-4 text-[11px] space-y-3.5 max-h-[80vh] overflow-y-auto">
