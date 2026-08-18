@@ -117,16 +117,16 @@ export function UserDetailModal({ user, onClose }) {
                 <span className="font-medium text-text-primary text-[11px]">{designation}</span>
               </div>
               <div>
-                <span className="text-[9px] uppercase font-bold text-text-secondary block">User Type ID</span>
-                <span className="font-medium text-text-primary text-[11px]">{user.user_type_id || 'Standard (2)'}</span>
+                <span className="text-[9px] uppercase font-bold text-text-secondary block">User Type</span>
+                <span className="font-medium text-text-primary text-[11px]">{user.user_type_name || user.type_name || (user.user_type_id ? `Type #${user.user_type_id}` : '—')}</span>
               </div>
               <div>
-                <span className="text-[9px] uppercase font-bold text-text-secondary block">User Status ID</span>
-                <span className="font-medium text-text-primary text-[11px]">{user.user_status_id || '1'}</span>
+                <span className="text-[9px] uppercase font-bold text-text-secondary block">User Status</span>
+                <span className="font-medium text-text-primary text-[11px]">{user.status_name || (user.user_status_id ? `Status #${user.user_status_id}` : '—')}</span>
               </div>
               <div>
                 <span className="text-[9px] uppercase font-bold text-text-secondary block">Role Privilege</span>
-                <span className="font-semibold text-text-primary text-[11px]">{isSuperAdmin ? 'Super Administrator' : 'Standard Staff'}</span>
+                <span className="font-semibold text-text-primary text-[11px]">{isSuperAdmin ? 'Super Administrator' : 'Standard User'}</span>
               </div>
             </div>
           </div>
@@ -165,8 +165,8 @@ export function UserDetailModal({ user, onClose }) {
                 <span className="font-mono font-medium text-text-primary text-[11px]">#{user.company_id || '1'}</span>
               </div>
               <div>
-                <span className="text-[9px] uppercase font-bold text-text-secondary block">Default Branch ID</span>
-                <span className="font-mono font-medium text-text-primary text-[11px]">{user.default_branch_id ? `#${user.default_branch_id}` : 'All Branches'}</span>
+                <span className="text-[9px] uppercase font-bold text-text-secondary block">Assigned Branch</span>
+                <span className="font-medium text-text-primary text-[11px]">{user.branch_name || user.default_branch_name || (user.default_branch_id ? `Branch #${user.default_branch_id}` : 'All Branches / Head Office')}</span>
               </div>
               <div>
                 <span className="text-[9px] uppercase font-bold text-text-secondary block">Status Message</span>

@@ -114,20 +114,6 @@ export const usersApi = {
     delete: (id) => request.delete(`/users/${enc(id)}`),
     remove: (id) => request.delete(`/users/${enc(id)}`),
 };
-export const userTypeMastersApi = { 
-    list: (params) => request.get('/users-user-type-masters', params).catch(() => request.get('/user-types', params)),
-    ...crud('/users-user-type-masters') 
-};
-export const userBranchAccessApi = { ...crud('/user-branch-access') };
-export const accessLevelMastersApi = { 
-    list: (params) => request.get('/user-branch-access-access-level-masters', params).catch(() => request.get('/access-levels', params)),
-    ...crud('/user-branch-access-access-level-masters') 
-};
-export const userRolesApi = { 
-    list: (params) => request.get('/user-roles', params).catch(() => request.get('/roles', params)),
-    ...crud('/user-roles') 
-};
-export const userStatusesApi = { ...crud('/user-statuses') };
 export const rolesApi = {
     list: (params) => request.get('/roles', params),
     get: (id) => request.get(`/roles/${enc(id)}`),
@@ -135,6 +121,16 @@ export const rolesApi = {
     update: (id, payload) => request.patch(`/roles/${enc(id)}`, payload),
     delete: (id) => request.delete(`/roles/${enc(id)}`),
     updatePermissions: (id, payload) => request.put(`/roles/${enc(id)}/permissions`, payload),
+};
+export const userRolesApi = rolesApi;
+export const userTypeMastersApi = {
+    list: () => mastersApi.all().then(res => res?.user_types || res?.user_type_masters || res?.data?.user_types || []).catch(() => [])
+};
+export const accessLevelMastersApi = {
+    list: () => mastersApi.all().then(res => res?.access_levels || res?.data?.access_levels || []).catch(() => [])
+};
+export const userStatusesApi = {
+    list: () => mastersApi.all().then(res => res?.user_statuses || res?.data?.user_statuses || []).catch(() => [])
 };
 
 export const clientsApi = {

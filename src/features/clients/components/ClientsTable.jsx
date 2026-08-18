@@ -221,16 +221,16 @@ export function ClientsTable({
               </tr>
             ) : (
               filteredClients.map((client, index) => {
-                const code = client.client_code || client.code || `CLT-${index + 1}`;
-                const name = client.client_name || client.name || 'Unnamed Client';
+                const code = client.client_code || '—';
+                const name = client.client_name || client.name || '—';
                 const legal = client.legal_name;
-                const industry = client.industry_type || client.industry || 'General';
-                const gstin = client.gstin || client.gst;
+                const industry = client.industry_type || '—';
+                const gstin = client.gstin;
                 const pan = client.pan;
                 const email = client.email;
-                const phone = client.phone || client.contact;
-                const credit = client.credit_limit !== undefined ? Number(client.credit_limit).toLocaleString('en-IN') : '0.00';
-                const terms = client.payment_terms_days !== undefined ? `${client.payment_terms_days}d` : '0d';
+                const phone = client.phone;
+                const credit = client.credit_limit !== undefined && client.credit_limit !== null ? Number(client.credit_limit).toLocaleString('en-IN') : '0.00';
+                const terms = client.payment_terms_days !== undefined && client.payment_terms_days !== null ? `${client.payment_terms_days}d` : '0d';
 
                 const isMenuOpen = openMenuId === client.id;
 

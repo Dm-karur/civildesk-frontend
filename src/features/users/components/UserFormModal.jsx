@@ -11,6 +11,26 @@ import {
 } from '../../../api/apiservice';
 import { toast } from '../../../components/composite/Toast';
 
+function extractBranchList(response) {
+  if (!response) return [];
+  if (Array.isArray(response)) return response;
+  if (Array.isArray(response.data)) return response.data;
+  if (Array.isArray(response.branches)) return response.branches;
+  if (Array.isArray(response.data?.branches)) return response.data.branches;
+  if (Array.isArray(response.data?.data)) return response.data.data;
+  if (response.data && typeof response.data === 'object') {
+    for (const key in response.data) {
+      if (Array.isArray(response.data[key])) return response.data[key];
+    }
+  }
+  if (response && typeof response === 'object') {
+    for (const key in response) {
+      if (Array.isArray(response[key])) return response[key];
+    }
+  }
+  return [];
+}
+
 export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   const isEditing = Boolean(user?.id);
   const [saving, setSaving] = useState(false);
@@ -64,38 +84,35 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   });
 
   useEffect(() => {
-    // Fetch live database tables
+    // Fetch live database tables cleanly
     branchesApi.list()
       .then(res => {
-        const list = res?.data || res || [];
+        const list = extractBranchList(res);
         if (Array.isArray(list) && list.length > 0) setBranches(list);
       })
       .catch(() => {});
 
-    userTypeMastersApi.list()
-      .then(res => {
-        const list = res?.data || res || [];
-        if (Array.isArray(list) && list.length > 0) setUserTypes(list);
-      })
-      .catch(() => {});
-
-    accessLevelMastersApi.list()
-      .then(res => {
-        const list = res?.data || res || [];
-        if (Array.isArray(list) && list.length > 0) setAccessLevels(list);
-      })
-      .catch(() => {});
-
-    userRolesApi.list()
+    rolesApi.list()
       .then(res => {
         const list = res?.data || res || [];
         if (Array.isArray(list) && list.length > 0) setRoles(list);
       })
       .catch(() => {});
 
+    userTypeMastersApi.list()
+      .then(list => {
+        if (Array.isArray(list) && list.length > 0) setUserTypes(list);
+      })
+      .catch(() => {});
+
+    accessLevelMastersApi.list()
+      .then(list => {
+        if (Array.isArray(list) && list.length > 0) setAccessLevels(list);
+      })
+      .catch(() => {});
+
     userStatusesApi.list()
-      .then(res => {
-        const list = res?.data || res || [];
+      .then(list => {
         if (Array.isArray(list) && list.length > 0) setStatuses(list);
       })
       .catch(() => {});
@@ -238,7 +255,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
           <div>
             <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
               <User className="w-3 h-3 text-primary" />
-              <span>1. User Account & Identity (`users`)</span>
+              <span>1. User Account & Identity</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
@@ -294,7 +311,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
           <div>
             <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
               <UserCheck className="w-3 h-3 text-primary" />
-              <span>2. Contact & Type (`users_user_type_masters`)</span>
+              <span>2. Contact & Classification</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
@@ -332,18 +349,21 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
                 />
               </div>
               <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">User Type Master</label>
+                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">User Type</label>
                 <select
                   name="user_type_id"
                   value={formData.user_type_id}
                   onChange={handleChange}
                   className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                 >
-                  {userTypes.map(ut => (
-                    <option key={ut.id} value={ut.id}>
-                      {ut.type_name || ut.name || `Type #${ut.id}`}
-                    </option>
-                  ))}
+                  {userTypes.map(ut => {
+                    const label = ut.type_name || ut.user_type_name || ut.name || ut.type_code || ut.user_type || ut.title || `Type #${ut.id}`;
+                    return (
+                      <option key={ut.id} value={ut.id}>
+                        {label}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             </div>
@@ -353,7 +373,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
           <div>
             <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
               <Building2 className="w-3 h-3 text-primary" />
-              <span>3. Branch & Access Level (`user_branch_access_access_level_masters`)</span>
+              <span>3. Branch & Access Level</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
@@ -374,7 +394,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
               </div>
               <div>
                 <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
-                  Access Level Master *
+                  Access Level *
                 </label>
                 <select
                   name="access_level_id"
@@ -397,7 +417,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
           <div>
             <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
               <Shield className="w-3 h-3 text-primary" />
-              <span>4. Role & Status (`user_roles` & `user_statuses`)</span>
+              <span>4. Role & Status</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>

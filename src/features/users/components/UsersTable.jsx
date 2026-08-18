@@ -170,13 +170,13 @@ export function UsersTable({
               </tr>
             ) : (
               filteredUsers.map((userObj, index) => {
-                const empCode = userObj.employee_code || `EMP-${index + 1}`;
-                const fullName = [userObj.first_name, userObj.last_name].filter(Boolean).join(' ') || userObj.name || userObj.username || 'User';
-                const username = userObj.username || 'user';
-                const designation = userObj.designation || 'Staff';
+                const empCode = userObj.employee_code || '—';
+                const fullName = [userObj.first_name, userObj.last_name].filter(Boolean).join(' ') || userObj.username || '—';
+                const username = userObj.username || '—';
+                const designation = userObj.designation || '—';
                 const email = userObj.email;
                 const phone = userObj.phone;
-                const lastLogin = userObj.last_login_at ? userObj.last_login_at.split(' ')[0] : (userObj.last_active ? userObj.last_active.split(' ')[0] : 'Never');
+                const lastLogin = userObj.last_login_at ? userObj.last_login_at.split(' ')[0] : (userObj.last_active ? userObj.last_active.split(' ')[0] : '—');
                 const lastIp = userObj.last_login_ip || '—';
                 const isSuper = userObj.is_super_admin === 1 || userObj.is_super_admin === '1' || userObj.is_super_admin === true;
                 const isActive = userObj.is_active === 1 || userObj.is_active === '1' || userObj.active === 1 || userObj.active === '1' || userObj.status === 'Active' || userObj.is_active === true;
