@@ -8,70 +8,58 @@ import { CompanyBranchPage } from '../../features/settings/pages/CompanyBranchPa
 import { AuthProvider } from '../../features/auth/context/AuthContext';
 import { ProtectedRoute } from '../../components/layout/ProtectedRoute';
 
-// We wrap everything in an AuthProvider layout component
-const RootLayout = () => (
-  <AuthProvider>
-    <Outlet />
-  </AuthProvider>
-);
-
 export const router = createBrowserRouter([
   {
-    element: <RootLayout />,
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/',
+    element: <ProtectedRoute />,
     children: [
       {
-        path: '/login',
-        element: <LoginPage />,
-      },
-      {
-        path: '/',
-        element: <ProtectedRoute />,
+        element: <AppShell />,
         children: [
           {
-            element: <AppShell />,
-            children: [
-              {
-                index: true,
-                element: <Navigate to="/dashboard" replace />,
-              },
-              {
-                path: 'dashboard',
-                element: <DashboardPage />,
-              },
-              {
-                path: 'projects',
-                element: <ProjectsListPage />,
-              },
-              {
-                path: 'project-masters/clients',
-                element: <ClientsListPage />,
-              },
-              {
-                path: 'clients',
-                element: <Navigate to="/project-masters/clients" replace />,
-              },
-              {
-                path: 'settings/company-branch',
-                element: <CompanyBranchPage />,
-              },
-              {
-                path: 'settings/company',
-                element: <Navigate to="/settings/company-branch" replace />,
-              },
-              {
-                path: 'settings/branch',
-                element: <Navigate to="/settings/company-branch" replace />,
-              },
-              // Placeholders for other routes
-              {
-                path: '*',
-                element: (
-                  <div className="p-8 flex items-center justify-center text-text-muted h-full">
-                    This module is under construction.
-                  </div>
-                ),
-              },
-            ],
+            index: true,
+            element: <Navigate to="/dashboard" replace />,
+          },
+          {
+            path: 'dashboard',
+            element: <DashboardPage />,
+          },
+          {
+            path: 'projects',
+            element: <ProjectsListPage />,
+          },
+          {
+            path: 'project-masters/clients',
+            element: <ClientsListPage />,
+          },
+          {
+            path: 'clients',
+            element: <Navigate to="/project-masters/clients" replace />,
+          },
+          {
+            path: 'settings/company-branch',
+            element: <CompanyBranchPage />,
+          },
+          {
+            path: 'settings/company',
+            element: <Navigate to="/settings/company-branch" replace />,
+          },
+          {
+            path: 'settings/branch',
+            element: <Navigate to="/settings/company-branch" replace />,
+          },
+          // Placeholders for other routes
+          {
+            path: '*',
+            element: (
+              <div className="p-8 flex items-center justify-center text-text-muted h-full">
+                This module is under construction.
+              </div>
+            ),
           },
         ],
       },
