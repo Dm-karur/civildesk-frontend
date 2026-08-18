@@ -35,59 +35,14 @@ export function BranchTable({ searchQuery = '' }) {
           list = responseData;
         } else if (responseData?.data && Array.isArray(responseData.data)) {
           list = responseData.data;
+        } else if (responseData && typeof responseData === 'object' && !Array.isArray(responseData)) {
+          list = [responseData];
         }
         
-        if (list.length > 0) {
-          setBranches(list);
-        } else {
-          // Default schema mock if none returned from live DB
-          setBranches([
-            {
-              id: 1,
-              branch_code: 'BR-MUM-01',
-              branch_name: 'Mumbai Head Office & Operations',
-              gstin: '27AABCU9603R1ZM',
-              email: 'mumbai.branch@civildesk.com',
-              phone: '+91 22 6123 4567',
-              address_line1: 'Nariman Bhavan, 12th Floor',
-              city: 'Mumbai',
-              state_name: 'Maharashtra',
-              postal_code: '400021',
-              is_head_office: 1,
-              is_active: 1
-            },
-            {
-              id: 2,
-              branch_code: 'BR-PUN-02',
-              branch_name: 'Pune Regional Construction Branch',
-              gstin: '27AABCU9603R2ZN',
-              email: 'pune.branch@civildesk.com',
-              phone: '+91 20 4123 8901',
-              address_line1: 'Baner High Street, Sector 3',
-              city: 'Pune',
-              state_name: 'Maharashtra',
-              postal_code: '411045',
-              is_head_office: 0,
-              is_active: 1
-            },
-            {
-              id: 3,
-              branch_code: 'BR-BLR-03',
-              branch_name: 'Bangalore Metro Site Office',
-              gstin: '29AABCU9603R1ZL',
-              email: 'bangalore.site@civildesk.com',
-              phone: '+91 80 5123 7890',
-              address_line1: 'Whitefield Main Road, Opp Metro Station',
-              city: 'Bengaluru',
-              state_name: 'Karnataka',
-              postal_code: '560066',
-              is_head_office: 0,
-              is_active: 1
-            }
-          ]);
-        }
+        setBranches(list);
       } catch (error) {
         console.error("Failed to fetch branches:", error);
+        setBranches([]);
       } finally {
         setLoading(false);
       }

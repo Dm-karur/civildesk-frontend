@@ -39,39 +39,18 @@ export function CompanyProfileCard() {
         list = responseData;
       } else if (responseData?.data && Array.isArray(responseData.data)) {
         list = responseData.data;
+      } else if (responseData && typeof responseData === 'object' && !Array.isArray(responseData)) {
+        list = [responseData];
       }
       
       if (list.length > 0) {
         setCompany(list[0]);
       } else {
-        // Default schema structure
-        setCompany({
-          id: 1,
-          company_code: 'CD-CORP-01',
-          company_name: 'CivilDesk Infrastructure Ltd.',
-          legal_name: 'CivilDesk Infrastructure Technologies Private Limited',
-          gstin: '27AABCU9603R1ZM',
-          pan: 'AABCU9603R',
-          cin: 'U72200MH2023PTC123456',
-          email: 'admin@civildesk.com',
-          phone: '+91 98765 43210',
-          website: 'www.civildesk.com',
-          address_line1: 'Plot 42, Technopark SEZ, Sector 5',
-          address_line2: 'Mahape Industrial Area',
-          city: 'Navi Mumbai',
-          district: 'Thane',
-          state_name: 'Maharashtra',
-          state_code: '27',
-          country_code: 'IN',
-          postal_code: '400701',
-          currency_code: 'INR',
-          date_format: 'd-m-Y',
-          timezone: 'Asia/Kolkata',
-          is_active: 1
-        });
+        setCompany(null);
       }
     } catch (error) {
       console.error('Failed to fetch company details:', error);
+      setCompany(null);
     } finally {
       setLoading(false);
     }
@@ -82,8 +61,10 @@ export function CompanyProfileCard() {
   }, []);
 
   const handleEditOpen = () => {
-    setEditForm({ ...company });
-    setIsEditing(true);
+    if (company) {
+      setEditForm({ ...company });
+      setIsEditing(true);
+    }
   };
 
   const handleSave = async (e) => {
@@ -116,7 +97,14 @@ export function CompanyProfileCard() {
     );
   }
 
-  if (!company) return null;
+  if (!company) {
+    return (
+      <div className="bg-surface border border-border rounded-sm p-4 mb-2.5 text-center text-text-secondary text-[12px]">
+        <Building2 className="w-6 h-6 mx-auto text-text-muted mb-1" />
+        No company data found in the database.
+      </div>
+    );
+  }
 
   // Format full address from schema columns
   const fullAddress = [
