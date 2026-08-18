@@ -5,49 +5,49 @@ import { SearchField } from '../../../components/composite/SearchField';
 
 export function ProjectsFilterBar() {
   return (
-    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-4">
-      <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0">
-        <div className="w-full sm:w-[250px] flex-shrink-0">
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-3">
+      <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+        <div className="w-full sm:w-[200px]">
           <SearchField 
-            placeholder="Search projects by name or code..."
+            placeholder="Search projects..."
             onChange={() => {}}
           />
         </div>
         
         <Select
-          className="w-full sm:w-[150px] flex-shrink-0"
+          className="w-full sm:w-[120px]"
           options={[{ value: 'all', label: 'All Clients' }]}
           value="all"
           onChange={() => {}}
         />
         
         <Select
-          className="w-full sm:w-[150px] flex-shrink-0"
+          className="w-full sm:w-[120px]"
           options={[{ value: 'all', label: 'All Status' }]}
           value="all"
           onChange={() => {}}
         />
         
         <Select
-          className="w-full sm:w-[150px] flex-shrink-0"
+          className="w-full sm:w-[120px]"
           options={[{ value: 'all', label: 'All Types' }]}
           value="all"
           onChange={() => {}}
         />
         
         <Select
-          className="w-full sm:w-[180px] flex-shrink-0"
-          options={[{ value: 'all', label: 'All Financial Years' }]}
+          className="w-full sm:w-[140px]"
+          options={[{ value: 'all', label: 'All Years' }]}
           value="all"
           onChange={() => {}}
         />
       </div>
       
-      <div className="flex items-center gap-3 w-full xl:w-auto justify-end flex-shrink-0">
-        <Button variant="outline" leftIcon={<Filter className="w-4 h-4" />}>
+      <div className="flex items-center gap-2 w-full lg:w-auto justify-end mt-2 lg:mt-0">
+        <Button variant="outline" className="h-9 px-3 text-[13px]" leftIcon={<Filter className="w-3.5 h-3.5" />}>
           Filter
         </Button>
-        <Button variant="primary" leftIcon={<Plus className="w-4 h-4" />}>
+        <Button variant="primary" className="h-9 px-3 text-[13px]" leftIcon={<Plus className="w-3.5 h-3.5" />}>
           Add Project
         </Button>
       </div>

@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppShell } from '../../components/layout';
 import { DashboardPage } from '../../features/dashboard/pages/DashboardPage';
 import { LoginPage } from '../../features/auth/pages/LoginPage';
+import { ProjectsListPage } from '../../features/projects/pages/ProjectsListPage';
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <DashboardPage />,
+      },
+      {
+        path: 'projects',
+        element: <ProjectsListPage />,
       },
   // Placeholders for other routes
   {

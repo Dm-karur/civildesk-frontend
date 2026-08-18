@@ -2,7 +2,7 @@ import { ChevronRight } from 'lucide-react';
 
 export function PageHeader({ title, description, actions, breadcrumbs }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start md:items-center justify-between gap-4 mb-8">
+    <div className="flex flex-col sm:flex-row sm:items-start md:items-center justify-between gap-2 mb-4">
       <div className="flex-1 min-w-0">
         {breadcrumbs && breadcrumbs.length > 0 && (
           <nav className="flex items-center gap-1 text-sm text-text-muted mb-2 overflow-x-auto whitespace-nowrap pb-1 sm:pb-0">

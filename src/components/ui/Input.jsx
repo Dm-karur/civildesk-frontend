@@ -18,7 +18,7 @@ export const Input = forwardRef(({
       <input
         ref={ref}
         className={cn(
-          'flex w-full h-[42px] px-3 py-2 bg-surface text-text-primary text-sm border border-border rounded-sm transition-all shadow-sm',
+          'flex w-full h-9 px-3 py-2 bg-surface text-text-primary text-[13px] border border-border rounded-sm transition-all shadow-sm',
           'placeholder:text-text-placeholder focus:outline-none focus:border-focus focus:ring-1 focus:ring-focus',
           'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-muted',
           error && 'border-error focus:border-error focus:ring-error',

@@ -21,11 +21,17 @@ import { clsx } from 'clsx';
 const NAVIGATION = [
   { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
   {
-    name: 'Project Master',
+    name: 'Projects',
     icon: Briefcase,
     submenus: [
-      { name: 'Project List', to: '/projects/list' },
-      { name: 'Create Project', to: '/projects/create' }
+      { name: 'Project Master', to: '/projects' },
+      { name: 'Clients', to: '/project-masters/clients' },
+      { name: 'Project Types', to: '/project-masters/types' },
+      { name: 'Project Status', to: '/project-masters/status' },
+      { name: 'Project Team', to: '/project-masters/team' },
+      { name: 'Financial Year', to: '/project-masters/financial-year' },
+      { name: 'Units', to: '/project-masters/units' },
+      { name: 'Work Categories', to: '/project-masters/work-categories' }
     ]
   },
   {

@@ -35,7 +35,7 @@ export function Select({
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center justify-between w-full h-[40px] px-3 bg-surface border rounded-[10px] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary/20",
+          "flex items-center justify-between w-full h-9 px-3 bg-surface border rounded-sm transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary/20",
           isOpen ? "border-primary ring-2 ring-primary/20" : "border-border",
           error ? "border-error focus:ring-error/20" : "",
           disabled ? "opacity-50 cursor-not-allowed bg-surface-muted" : "hover:border-border-strong cursor-pointer"
@@ -43,7 +43,7 @@ export function Select({
       >
         <div className="flex items-center gap-2 min-w-0">
           {leftIcon && <span className="text-text-secondary flex-shrink-0 flex items-center justify-center [&>svg]:w-4 [&>svg]:h-4">{leftIcon}</span>}
-          <span className={cn("text-[14px] truncate font-medium", selectedOption ? "text-text-primary" : "text-text-placeholder")}>
+          <span className={cn("text-[13px] truncate font-medium", selectedOption ? "text-text-primary" : "text-text-placeholder")}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
@@ -53,7 +53,7 @@ export function Select({
       {isOpen && (
         <div 
           className={cn(
-            "absolute z-50 mt-1 bg-surface border border-border rounded-[10px] shadow-level-2 py-1 max-h-[300px] overflow-y-auto scrollbar-hide",
+            "absolute z-50 mt-1 bg-surface border border-border rounded-sm shadow-level-2 py-1 max-h-[300px] overflow-y-auto scrollbar-hide",
             dropdownWidth
           )}
           style={{
@@ -67,7 +67,7 @@ export function Select({
                 key={option.value}
                 type="button"
                 className={cn(
-                  "w-full flex items-center justify-between px-3 py-2 text-[14px] transition-colors cursor-pointer text-left",
+                  "w-full flex items-center justify-between px-3 py-2 text-[13px] transition-colors cursor-pointer text-left",
                   isSelected ? "bg-[#EAF2FF] text-primary" : "text-text-primary hover:bg-[#F1F6FD]"
                 )}
                 onClick={() => {
