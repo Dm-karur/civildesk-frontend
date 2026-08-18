@@ -15,10 +15,24 @@ import {
   Coins,
   Receipt,
   UserCheck,
-  AlertCircle
+  AlertCircle,
+  HelpCircle,
+  Ban
 } from 'lucide-react';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
+const STATUS_MAP = {
+  1: { code: 'PROSPECT', label: 'Prospect', variant: 'info', icon: HelpCircle },
+  2: { code: 'ACTIVE', label: 'Active', variant: 'success', icon: CheckCircle2 },
+  3: { code: 'ON_HOLD', label: 'On Hold', variant: 'warning', icon: AlertCircle },
+  4: { code: 'INACTIVE', label: 'Inactive', variant: 'neutral', icon: XCircle },
+  5: { code: 'BLACKLISTED', label: 'Blacklisted', variant: 'error', icon: Ban },
+  'PROSPECT': { code: 'PROSPECT', label: 'Prospect', variant: 'info', icon: HelpCircle },
+  'ACTIVE': { code: 'ACTIVE', label: 'Active', variant: 'success', icon: CheckCircle2 },
+  'ON_HOLD': { code: 'ON_HOLD', label: 'On Hold', variant: 'warning', icon: AlertCircle },
+  'INACTIVE': { code: 'INACTIVE', label: 'Inactive', variant: 'neutral', icon: XCircle },
+  'BLACKLISTED': { code: 'BLACKLISTED', label: 'Blacklisted', variant: 'error', icon: Ban },
+};
 
 export function ClientDetailModal({ client, onClose }) {
   if (!client) return null;
@@ -37,7 +51,14 @@ export function ClientDetailModal({ client, onClose }) {
   const termsDays = client.payment_terms_days !== undefined ? `${client.payment_terms_days} Days` : '0 Days';
   const creditLimit = client.credit_limit !== undefined ? Number(client.credit_limit).toLocaleString('en-IN') : '0.00';
   const tdsApplicable = client.tax_deduction_applicable === 1 || client.tax_deduction_applicable === '1' || client.tax_deduction_applicable === true;
-  const isActive = client.client_status_id === 1 || client.client_status_id === '1' || client.is_active === 1 || client.status === 'Active' || client.status === 1 || client.client_status_id === undefined;
+
+  const rawStatus = client.client_status_id || client.status_code || client.status || 1;
+  const statusConfig = STATUS_MAP[rawStatus] || {
+    label: client.status_name || client.status || 'Active',
+    variant: 'neutral',
+    icon: HelpCircle
+  };
+  const StatusIcon = statusConfig.icon;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
@@ -65,11 +86,11 @@ export function ClientDetailModal({ client, onClose }) {
 
           <div className="flex items-center gap-2">
             <Badge 
-              variant={isActive ? 'success' : 'neutral'}
-              className="text-[9px] font-bold uppercase tracking-wider h-5 px-2 inline-flex items-center gap-1 leading-none"
+              variant={statusConfig.variant}
+              className="text-[9px] font-bold uppercase tracking-wider h-5 px-2 inline-flex items-center gap-1 leading-none font-sans"
             >
-              {isActive ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-              {isActive ? 'Active' : 'Inactive'}
+              <StatusIcon className="w-3 h-3" />
+              <span>{statusConfig.label}</span>
             </Badge>
             <button 
               onClick={onClose}

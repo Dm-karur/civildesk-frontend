@@ -131,6 +131,11 @@ export const clientsApi = {
         download: (clientId, documentId) => request.download(`/clients/${enc(clientId)}/documents/${enc(documentId)}/download`),
     },
 };
+export const clientStatusesApi = { ...crud('/client-statuses') };
+export const clientSourcesApi = { ...crud('/client-sources') };
+export const clientDocumentsApi = { ...crud('/client-documents') };
+export const clientContactsApi = { ...crud('/client-contacts') };
+export const clientAddressesApi = { ...crud('/client-addresses') };
 
 export const projectsApi = {
     ...crud('/projects'),

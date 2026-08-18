@@ -7,6 +7,7 @@ export function ClientsListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [industryFilter, setIndustryFilter] = useState('all');
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   return (
     <PageContainer>
@@ -26,13 +27,15 @@ export function ClientsListPage() {
           onStatusChange={setStatusFilter}
           industryFilter={industryFilter}
           onIndustryChange={setIndustryFilter}
-          onAddClient={() => alert('Add Client form will open.')}
+          onAddClient={() => setIsAddOpen(true)}
         />
         <div className="flex-1 min-h-0 flex flex-col">
           <ClientsTable 
             searchQuery={searchQuery}
             statusFilter={statusFilter}
             industryFilter={industryFilter}
+            isAddOpen={isAddOpen}
+            setIsAddOpen={setIsAddOpen}
           />
         </div>
       </div>
