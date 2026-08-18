@@ -111,6 +111,8 @@ export const usersApi = {
     get: (id) => request.get(`/users/${enc(id)}`),
     create: (payload) => request.post('/users', payload),
     update: (id, payload) => request.patch(`/users/${enc(id)}`, payload),
+    delete: (id) => request.delete(`/users/${enc(id)}`),
+    remove: (id) => request.delete(`/users/${enc(id)}`),
 };
 export const rolesApi = {
     list: (params) => request.get('/roles', params),

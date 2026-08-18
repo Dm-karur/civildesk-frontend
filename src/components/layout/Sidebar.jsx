@@ -110,7 +110,8 @@ const NAVIGATION = [
     name: 'Settings',
     icon: Settings,
     submenus: [
-      { name: 'Company & Branch', to: '/settings/company-branch' }
+      { name: 'Company & Branch', to: '/settings/company-branch' },
+      { name: 'User Master', to: '/settings/users' }
     ]
   },
 ];

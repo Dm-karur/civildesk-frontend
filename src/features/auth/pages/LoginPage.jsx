@@ -87,9 +87,9 @@ export function LoginPage() {
       <div className="hidden lg:flex relative w-1/2 flex-col overflow-hidden">
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/src/assets/loginpageimage.jpg" 
-            alt="Construction Site" 
+          <img
+            src="/src/assets/loginpageimage.jpg"
+            alt="Construction Site"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-[#061A33]/80 mix-blend-multiply" />
@@ -109,7 +109,7 @@ export function LoginPage() {
           </h1>
           <div className="w-12 h-[3px] bg-[#0056C9] mb-8" />
           <p className="text-[16px] text-[#C8D1DC] leading-relaxed mb-16">
-            Manage your projects, teams, materials and<br/>
+            Manage your projects, teams, materials and<br />
             costs efficiently. Real-time visibility.<br />
             Smarter decisions.
           </p>
@@ -122,21 +122,21 @@ export function LoginPage() {
               </div>
               <span className="text-[13px] font-medium text-white/90">Project<br />Tracking</span>
             </div>
-            
+
             <div className="flex flex-col items-start gap-4 text-left">
               <div className="w-[48px] h-[48px] rounded-xl flex items-center justify-center border border-[#5A94DE]/30 text-[#5A94DE]">
                 <Users className="w-6 h-6" strokeWidth={1.5} />
               </div>
               <span className="text-[13px] font-medium text-white/90">Labour<br />Management</span>
             </div>
-            
+
             <div className="flex flex-col items-start gap-4 text-left">
               <div className="w-[48px] h-[48px] rounded-xl flex items-center justify-center border border-[#5A94DE]/30 text-[#5A94DE]">
                 <Package className="w-6 h-6" strokeWidth={1.5} />
               </div>
               <span className="text-[13px] font-medium text-white/90">Material<br />Management</span>
             </div>
-            
+
             <div className="flex flex-col items-start gap-4 text-left">
               <div className="w-[48px] h-[48px] rounded-xl flex items-center justify-center border border-[#5A94DE]/30 text-[#5A94DE]">
                 <IndianRupee className="w-6 h-6" strokeWidth={1.5} />
@@ -162,14 +162,14 @@ export function LoginPage() {
               <p className="text-[#535D6D] text-[15px]">Sign in to your Civil Desk account</p>
             </div>
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-              
+
               <FormField label="Username or Email" error={errors.identifier} htmlFor="identifier">
-                <Input 
+                <Input
                   id="identifier"
                   name="identifier"
                   value={formData.identifier}
                   onChange={handleChange}
-                  placeholder="Enter your username or email" 
+                  placeholder="Enter your username or email"
                   className="h-11"
                   autoComplete="username"
                   disabled={isLoading}
@@ -178,19 +178,19 @@ export function LoginPage() {
               </FormField>
 
               <FormField label="Password" error={errors.password} htmlFor="password">
-                <Input 
+                <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Enter your password" 
+                  placeholder="Enter your password"
                   className="h-11"
                   autoComplete="current-password"
                   disabled={isLoading}
                   leftIcon={<Lock className="h-[18px] w-[18px]" />}
                   rightIcon={
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="pointer-events-auto text-text-placeholder hover:text-text-secondary focus:outline-none cursor-pointer"
@@ -204,10 +204,10 @@ export function LoginPage() {
               </FormField>
 
               <div className="flex items-center justify-between mt-1 mb-2">
-                <Checkbox 
-                  id="remember" 
+                <Checkbox
+                  id="remember"
                   name="remember"
-                  label="Remember me" 
+                  label="Remember me"
                   checked={formData.remember}
                   onChange={handleChange}
                   disabled={isLoading}
@@ -217,9 +217,9 @@ export function LoginPage() {
                 </a>
               </div>
 
-              <Button 
-                type="submit" 
-                size="lg" 
+              <Button
+                type="submit"
+                size="lg"
                 className="w-full h-11 text-[15px] font-semibold"
                 isLoading={isLoading}
               >
