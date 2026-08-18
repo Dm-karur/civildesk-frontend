@@ -6,6 +6,7 @@ import { ProjectsListPage } from '../../features/projects/pages/ProjectsListPage
 import { ClientsListPage } from '../../features/clients/pages/ClientsListPage';
 import { CompanyBranchPage } from '../../features/settings/pages/CompanyBranchPage';
 import { UsersListPage } from '../../features/users/pages/UsersListPage';
+import { PermissionsPage } from '../../features/permissions/pages/PermissionsPage';
 import { AuthProvider } from '../../features/auth/context/AuthContext';
 import { ProtectedRoute } from '../../components/layout/ProtectedRoute';
 
@@ -52,6 +53,14 @@ export const router = createBrowserRouter([
           {
             path: 'users',
             element: <Navigate to="/settings/users" replace />,
+          },
+          {
+            path: 'settings/permissions',
+            element: <PermissionsPage />,
+          },
+          {
+            path: 'permissions',
+            element: <Navigate to="/settings/permissions" replace />,
           },
           {
             path: 'settings/company',

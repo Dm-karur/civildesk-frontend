@@ -123,6 +123,11 @@ export const rolesApi = {
     updatePermissions: (id, payload) => request.put(`/roles/${enc(id)}/permissions`, payload),
 };
 export const userRolesApi = rolesApi;
+export const permissionsApi = {
+    list: (params) => request.get('/permissions', params).catch(() => []),
+    byRole: (roleId) => request.get(`/roles/${enc(roleId)}/permissions`).catch(() => []),
+    updateRolePermissions: (roleId, payload) => request.put(`/roles/${enc(roleId)}/permissions`, payload),
+};
 export const userTypeMastersApi = {
     list: () => mastersApi.all().then(res => res?.user_types || res?.user_type_masters || res?.data?.user_types || []).catch(() => [])
 };
