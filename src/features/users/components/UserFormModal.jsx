@@ -194,12 +194,22 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
       const selectedUserType = Number(formData.user_type_id) || 2;
       const selectedUserStatus = Number(formData.user_status_id) || 1;
 
-      // Determine valid branch ID
-      const fallbackBranchId = branches.length > 0 && branches[0].id ? Number(branches[0].id) : 1;
-      const selectedBranchId = formData.default_branch_id ? Number(formData.default_branch_id) : fallbackBranchId;
-      const branchIdsList = [selectedBranchId];
+      // Build valid branch IDs list
+      let branchIds = [];
+      if (Array.isArray(formData.branch_ids) && formData.branch_ids.length > 0) {
+        branchIds = formData.branch_ids.map(Number);
+      } else if (formData.default_branch_id) {
+        branchIds = [Number(formData.default_branch_id)];
+      } else if (branches.length > 0) {
+        branchIds = branches.map(b => Number(b.id)).filter(id => !isNaN(id) && id > 0);
+      }
+      if (branchIds.length === 0) {
+        branchIds = [1];
+      }
 
-      // Build complete payload matching all 6 MySQL tables
+      const activeDefaultBranch = formData.default_branch_id ? Number(formData.default_branch_id) : branchIds[0];
+
+      // Build complete payload matching all MySQL tables & validation rules
       const payload = {
         ...formData,
         role_id: selectedRoleId,
@@ -209,9 +219,10 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
         user_type_id: selectedUserType,
         user_status_id: selectedUserStatus,
         company_id: Number(formData.company_id) || 1,
-        default_branch_id: selectedBranchId,
-        branch_ids: branchIdsList,
-        branches: branchIdsList,
+        default_branch_id: activeDefaultBranch,
+        branch_id: activeDefaultBranch,
+        branch_ids: branchIds,
+        branches: branchIds,
         is_super_admin: formData.is_super_admin ? 1 : 0,
         is_active: Number(formData.is_active),
         active: Number(formData.is_active),
