@@ -85,38 +85,48 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   });
 
   useEffect(() => {
-    // Fetch live database tables cleanly
-    branchesApi.list()
-      .then(res => {
-        const list = extractBranchList(res);
-        if (Array.isArray(list) && list.length > 0) setBranches(list);
-      })
-      .catch(() => {});
+    // Fetch live database tables cleanly with defensive guards
+    if (branchesApi?.list) {
+      branchesApi.list()
+        .then(res => {
+          const list = extractBranchList(res);
+          if (Array.isArray(list) && list.length > 0) setBranches(list);
+        })
+        .catch(() => {});
+    }
 
-    rolesApi.list()
-      .then(res => {
-        const list = res?.data || res || [];
-        if (Array.isArray(list) && list.length > 0) setRoles(list);
-      })
-      .catch(() => {});
+    if (rolesApi?.list) {
+      rolesApi.list()
+        .then(res => {
+          const list = res?.data || res || [];
+          if (Array.isArray(list) && list.length > 0) setRoles(list);
+        })
+        .catch(() => {});
+    }
 
-    userTypeMastersApi.list()
-      .then(list => {
-        if (Array.isArray(list) && list.length > 0) setUserTypes(list);
-      })
-      .catch(() => {});
+    if (userTypeMastersApi?.list) {
+      userTypeMastersApi.list()
+        .then(list => {
+          if (Array.isArray(list) && list.length > 0) setUserTypes(list);
+        })
+        .catch(() => {});
+    }
 
-    accessLevelMastersApi.list()
-      .then(list => {
-        if (Array.isArray(list) && list.length > 0) setAccessLevels(list);
-      })
-      .catch(() => {});
+    if (accessLevelMastersApi?.list) {
+      accessLevelMastersApi.list()
+        .then(list => {
+          if (Array.isArray(list) && list.length > 0) setAccessLevels(list);
+        })
+        .catch(() => {});
+    }
 
-    userStatusesApi.list()
-      .then(list => {
-        if (Array.isArray(list) && list.length > 0) setStatuses(list);
-      })
-      .catch(() => {});
+    if (userStatusesApi?.list) {
+      userStatusesApi.list()
+        .then(list => {
+          if (Array.isArray(list) && list.length > 0) setStatuses(list);
+        })
+        .catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
