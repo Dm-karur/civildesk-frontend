@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Activity, Users, IndianRupee, Package, Building2 } from 'lucide-react';
 import { Button, Input, Checkbox } from '../../../components/ui';
 import { FormField } from '../../../components/composite/FormField';
 import { toast } from '../../../components/composite/Toast';
-import { authApi } from '../../../api/apiservice';
+import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -16,12 +17,6 @@ export function LoginPage() {
     remember: false
   });
   const [errors, setErrors] = useState({});
-
-  // Clear any existing session when the login page loads
-  // This prevents the backend from auto-authenticating with stale cookies
-  useEffect(() => {
-    authApi.logout().catch(() => {});
-  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -50,26 +45,11 @@ export function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await authApi.login(formData.identifier, formData.password, formData.remember);
-      
-      // Check if the server returned HTML (often happens when the proxy hits a default index.php or 404 page)
-      if (typeof response === 'string' && response.includes('<html')) {
-        throw new Error('API route not found on the server (returned HTML).');
-      }
-
-      // Check if the backend returns a 200 OK but with an error flag in the JSON
-      if (response?.error || response?.success === false || response?.status === 'error' || response?.status === false) {
-        throw new Error(response?.message || response?.error || 'Invalid credentials');
-      }
-
-      // If we expect a token or user object and didn't get one, assume failure
-      if (response && !response.token && !response.access_token && !response.user && !response.data) {
-        throw new Error(response?.message || 'Invalid credentials. No token received.');
-      }
-
+      await login(formData.identifier, formData.password, formData.remember);
       toast.success('Successfully logged in');
       navigate('/dashboard');
     } catch (err) {
+      console.error('Login error:', err);
       const errorMessage = err?.message || 'Please check your credentials and try again.';
       toast.error('Failed to log in', { description: errorMessage });
     } finally {

@@ -25,7 +25,9 @@ api.interceptors.response.use(
             data: error.response?.data || null,
             original: error,
         };
-        if (normalized.status === 401 && !error.config?.url?.endsWith('/auth/login')) {
+        const url = error.config?.url || '';
+        const isAuthUrl = url.includes('/auth/login') || url.includes('/auth/logout') || url.includes('/auth/me');
+        if (normalized.status === 401 && !isAuthUrl) {
             window.dispatchEvent(new CustomEvent('api:unauthorized', { detail: normalized }));
         }
         return Promise.reject(normalized);
@@ -77,7 +79,15 @@ const nestedCrud = (baseForParent) => ({
 });
 
 export const authApi = {
-    login: (email, password, remember = false) => request.post('/auth/login', { email, password, remember }),
+    login: (identifier, password, remember = false) => request.post('/auth/login', { 
+        email: identifier, 
+        username: identifier, 
+        identifier: identifier, 
+        identity: identifier, 
+        login: identifier,
+        password, 
+        remember 
+    }),
     me: () => request.get('/auth/me'),
     logout: () => request.post('/auth/logout'),
     changePassword: (payload) => request.post('/auth/change-password', payload),

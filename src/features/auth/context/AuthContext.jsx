@@ -40,18 +40,36 @@ export function AuthProvider({ children }) {
   }, [fetchUser]);
 
   const login = async (identifier, password, remember) => {
-    // This will throw if login fails, to be caught by the component
+    // This will throw if backend rejects credentials
     const response = await authApi.login(identifier, password, remember);
-    // After login, fetch the user profile to populate state
-    await fetchUser();
+    
+    // Check if response contains an error flag from the server
+    const data = response?.data || response;
+    if (data?.success === false || data?.error || data?.status === 'error') {
+      throw new Error(data?.message || data?.error || 'Invalid credentials');
+    }
+
+    // Set authenticated state
+    setIsAuthenticated(true);
+    const initialUser = data?.user || { email: identifier, name: identifier.split('@')[0] };
+    setUser(initialUser);
+
+    // Refresh profile in background
+    authApi.me()
+      .then(res => {
+        const u = res?.data?.user || res?.data || res;
+        if (u && typeof u === 'object') setUser(u);
+      })
+      .catch(() => {});
+
     return response;
   };
 
   const logout = async () => {
     try {
       await authApi.logout();
-    } catch (error) {
-      console.error("Logout API failed, but continuing local cleanup.", error);
+    } catch {
+      // Ignore errors on logout
     } finally {
       setUser(null);
       setIsAuthenticated(false);
