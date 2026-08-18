@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Activity, Users, IndianRupee, Package, Building2 } from 'lucide-react';
 import { Button, Input, Checkbox } from '../../../components/ui';
