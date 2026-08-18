@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,6 +17,12 @@ export function LoginPage() {
     remember: false
   });
   const [errors, setErrors] = useState({});
+
+  // Clear any existing session when the login page loads
+  // This prevents the backend from auto-authenticating with stale cookies
+  useEffect(() => {
+    logout().catch(() => { });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -45,7 +51,23 @@ export function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login(formData.identifier, formData.password, formData.remember);
+      const response = await login(formData.identifier, formData.password, formData.remember);
+
+      // Check if the server returned HTML (often happens when the proxy hits a default index.php or 404 page)
+      if (typeof response === 'string' && response.includes('<html')) {
+        throw new Error('API route not found on the server (returned HTML).');
+      }
+
+      // Check if the backend returns a 200 OK but with an error flag in the JSON
+      if (response?.error || response?.success === false || response?.status === 'error' || response?.status === false) {
+        throw new Error(response?.message || response?.error || 'Invalid credentials');
+      }
+
+      // If we expect a token or user object and didn't get one, assume failure
+      if (response && !response.token && !response.access_token && !response.user && !response.data) {
+        throw new Error(response?.message || 'Invalid credentials. No token received.');
+      }
+
       toast.success('Successfully logged in');
       navigate('/dashboard');
     } catch (err) {
@@ -60,10 +82,9 @@ export function LoginPage() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[#E5E7EB] p-4 sm:p-6 lg:p-8 font-sans">
-      <div className="flex w-full h-[calc(100dvh-32px)] sm:h-[calc(100dvh-48px)] lg:h-[calc(100dvh-64px)] max-w-[1600px] bg-[#F8F9FC] rounded-[20px] overflow-hidden shadow-2xl relative">
-        {/* Left Panel - Hidden on smaller screens */}
-        <div className="hidden lg:flex relative w-1/2 flex-col overflow-hidden">
+    <div className="h-[100dvh] overflow-hidden flex w-full bg-[#F8F9FC] font-sans">
+      {/* Left Panel - Hidden on smaller screens */}
+      <div className="hidden lg:flex relative w-1/2 flex-col overflow-hidden">
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -213,7 +234,6 @@ export function LoginPage() {
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );
