@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Activity, Users, IndianRupee, Package, Building2 } from 'lucide-react';
 import { Button, Input, Checkbox } from '../../../components/ui';
 import { FormField } from '../../../components/composite/FormField';
 import { toast } from '../../../components/composite/Toast';
+import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -43,18 +45,20 @@ export function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Per user request: DO NOT create API or endpoints yet. Just defer to navigate.
-      // We simulate network delay to show loading state.
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
+      await login(formData.identifier, formData.password, formData.remember);
       toast.success('Successfully logged in');
       navigate('/dashboard');
-    } catch {
-      toast.error('Failed to log in', { description: 'Please check your credentials and try again.' });
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Failed to log in', { description: error?.message || 'Please check your credentials and try again.' });
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const currentYear = new Date().getFullYear();
 

@@ -106,7 +106,13 @@ const NAVIGATION = [
       { name: 'Progress', to: '/reports/progress' }
     ]
   },
-  { name: 'Settings', to: '/settings', icon: Settings },
+  {
+    name: 'Settings',
+    icon: Settings,
+    submenus: [
+      { name: 'Company & Branch', to: '/settings/company-branch' }
+    ]
+  },
 ];
 
 function NavItem({ item }) {
