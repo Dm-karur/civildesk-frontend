@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // .env: VITE_API_BASE_URL=http://localhost:8080/api
 export const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+    baseURL: import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? '/api' : 'https://white-marten-572750.hostingersite.com/backend/public/api'),
     withCredentials: true,
     headers: { Accept: 'application/json' },
     timeout: 30000,
@@ -92,6 +92,9 @@ export const companiesApi = {
 export const branchesApi = {
     list: (params) => request.get('/branches', params),
     get: (id) => request.get(`/branches/${enc(id)}`),
+    create: (payload) => request.post('/branches', payload),
+    update: (id, payload) => request.patch(`/branches/${enc(id)}`, payload),
+    delete: (id) => request.delete(`/branches/${enc(id)}`),
 };
 export const usersApi = {
     list: (params) => request.get('/users', params),
@@ -102,6 +105,9 @@ export const usersApi = {
 export const rolesApi = {
     list: (params) => request.get('/roles', params),
     get: (id) => request.get(`/roles/${enc(id)}`),
+    create: (payload) => request.post('/roles', payload),
+    update: (id, payload) => request.patch(`/roles/${enc(id)}`, payload),
+    delete: (id) => request.delete(`/roles/${enc(id)}`),
     updatePermissions: (id, payload) => request.put(`/roles/${enc(id)}/permissions`, payload),
 };
 
@@ -135,6 +141,7 @@ export const sitesApi = {
 };
 export const siteZonesApi = { ...crud('/site-zones') };
 export const workLocationsApi = { ...crud('/work-locations') };
+export const projectDocumentsApi = { ...crud('/project-documents') };
 
 export const boqApi = {
     ...crud('/project-boqs'),
