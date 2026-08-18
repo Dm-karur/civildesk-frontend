@@ -163,70 +163,168 @@ export function BranchTable({ searchQuery = '' }) {
         </table>
       </DataTableContainer>
 
-      {/* Branch Detail Modal */}
+      {/* Complete Branch Detail View Modal */}
       {selectedBranch && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-surface border border-border rounded-sm shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between px-3.5 py-2 border-b border-border bg-surface-muted/50">
+          <div className="bg-surface border border-border rounded-sm shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-surface-muted/60">
               <div className="flex items-center gap-2">
-                <Building className="w-4 h-4 text-primary" />
-                <h3 className="text-[12px] font-bold text-text-primary">
-                  {selectedBranch.branch_name || selectedBranch.name || 'Branch Details'}
-                </h3>
+                <div className="w-7 h-7 rounded-xs bg-primary/10 flex items-center justify-center text-primary">
+                  <Building className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-[13px] font-bold text-text-primary">
+                      {selectedBranch.branch_name || selectedBranch.name || 'Branch Details'}
+                    </h3>
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 bg-surface border border-border rounded text-text-secondary font-medium">
+                      {selectedBranch.branch_code || selectedBranch.code || 'N/A'}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-text-secondary">Branch ID: #{selectedBranch.id} • Company ID: #{selectedBranch.company_id || '1'}</p>
+                </div>
               </div>
-              <button 
-                onClick={() => setSelectedBranch(null)}
-                className="text-text-secondary hover:text-text-primary p-0.5"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              
+              <div className="flex items-center gap-2">
+                {(selectedBranch.is_head_office === 1 || selectedBranch.is_head_office === '1' || selectedBranch.is_head_office === true) && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center gap-1">
+                    <Crown className="w-2.5 h-2.5" />
+                    Head Office
+                  </span>
+                )}
+                <Badge 
+                  variant={(selectedBranch.is_active === 1 || selectedBranch.is_active === '1' || selectedBranch.is_active === true || selectedBranch.status === 'Active') ? 'success' : 'neutral'}
+                  className="text-[8px] font-bold uppercase tracking-wider h-4 px-1.5 inline-flex items-center gap-0.5"
+                >
+                  {(selectedBranch.is_active === 1 || selectedBranch.is_active === '1' || selectedBranch.is_active === true || selectedBranch.status === 'Active') ? (
+                    <CheckCircle2 className="w-2.5 h-2.5" />
+                  ) : (
+                    <XCircle className="w-2.5 h-2.5" />
+                  )}
+                  {(selectedBranch.is_active === 1 || selectedBranch.is_active === '1' || selectedBranch.is_active === true || selectedBranch.status === 'Active') ? 'Active' : 'Inactive'}
+                </Badge>
+                <button 
+                  onClick={() => setSelectedBranch(null)}
+                  className="text-text-secondary hover:text-text-primary p-1 rounded-xs hover:bg-surface"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            <div className="p-3 text-[11px] space-y-2.5">
-              <div className="grid grid-cols-2 gap-2 bg-surface-muted/30 p-2 rounded-xs border border-border/60">
-                <div>
-                  <span className="text-[9px] uppercase font-bold text-text-secondary block">Branch Code</span>
-                  <span className="font-mono font-semibold text-text-primary">
-                    {selectedBranch.branch_code || selectedBranch.code || 'N/A'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[9px] uppercase font-bold text-text-secondary block">GSTIN</span>
-                  <span className="font-mono font-semibold text-text-primary">
-                    {selectedBranch.gstin || selectedBranch.gst || 'N/A'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[9px] uppercase font-bold text-text-secondary block">Email</span>
-                  <span className="font-medium text-text-primary">
-                    {selectedBranch.email || 'N/A'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[9px] uppercase font-bold text-text-secondary block">Phone</span>
-                  <span className="font-medium text-text-primary">
-                    {selectedBranch.phone || selectedBranch.contact || 'N/A'}
-                  </span>
+            {/* Modal Body */}
+            <div className="p-4 text-[11px] space-y-3 max-h-[80vh] overflow-y-auto">
+              {/* Section 1: General & Tax Information */}
+              <div>
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
+                  <span>General & Tax Information</span>
+                </h4>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-surface-muted/30 p-2.5 rounded-xs border border-border/70">
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Branch Code</span>
+                    <span className="font-mono font-semibold text-text-primary text-[11px]">{selectedBranch.branch_code || selectedBranch.code || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">GSTIN</span>
+                    <span className="font-mono font-semibold text-text-primary text-[11px]">{selectedBranch.gstin || selectedBranch.gst || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Branch Type ID</span>
+                    <span className="font-medium text-text-primary text-[11px]">{selectedBranch.branch_type_id || 'Standard'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Head Office</span>
+                    <span className="font-medium text-text-primary text-[11px]">
+                      {(selectedBranch.is_head_office === 1 || selectedBranch.is_head_office === '1' || selectedBranch.is_head_office === true) ? 'Yes (Headquarters)' : 'No (Branch Office)'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-surface-muted/30 p-2 rounded-xs border border-border/60">
-                <span className="text-[9px] uppercase font-bold text-text-secondary block mb-0.5">Address</span>
-                <p className="text-text-primary font-medium">
-                  {[
-                    selectedBranch.address_line1 || selectedBranch.address,
-                    selectedBranch.address_line2,
-                    selectedBranch.city,
-                    selectedBranch.district,
-                    selectedBranch.state_name || selectedBranch.state,
-                    selectedBranch.postal_code || selectedBranch.pincode,
-                    selectedBranch.country_code
-                  ].filter(Boolean).join(', ') || 'N/A'}
-                </p>
+              {/* Section 2: Contact Information */}
+              <div>
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">
+                  Contact Information
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-surface-muted/30 p-2.5 rounded-xs border border-border/70">
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Email Address</span>
+                    <span className="font-medium text-text-primary text-[11px] break-all">{selectedBranch.email || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Phone Number</span>
+                    <span className="font-medium text-text-primary text-[11px]">{selectedBranch.phone || selectedBranch.contact || '—'}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex justify-end pt-1">
-                <Button size="sm" variant="outline" className="h-6 text-[11px]" onClick={() => setSelectedBranch(null)}>
+              {/* Section 3: Detailed Address Breakdown */}
+              <div>
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">
+                  Complete Address Breakdown
+                </h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-surface-muted/30 p-2.5 rounded-xs border border-border/70">
+                  <div className="sm:col-span-2">
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Address Line 1</span>
+                    <span className="font-medium text-text-primary text-[11px]">{selectedBranch.address_line1 || selectedBranch.address || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Address Line 2</span>
+                    <span className="font-medium text-text-primary text-[11px]">{selectedBranch.address_line2 || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">City</span>
+                    <span className="font-medium text-text-primary text-[11px]">{selectedBranch.city || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">District</span>
+                    <span className="font-medium text-text-primary text-[11px]">{selectedBranch.district || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">State</span>
+                    <span className="font-medium text-text-primary text-[11px]">
+                      {selectedBranch.state_name || selectedBranch.state || '—'} {selectedBranch.state_code ? `(${selectedBranch.state_code})` : ''}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Postal Code</span>
+                    <span className="font-mono font-medium text-text-primary text-[11px]">{selectedBranch.postal_code || selectedBranch.pincode || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Country Code</span>
+                    <span className="font-medium text-text-primary text-[11px]">{selectedBranch.country_code || 'IN'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 4: GPS Coordinates & System Meta */}
+              <div>
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">
+                  GPS Coordinates & System Metadata
+                </h4>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-surface-muted/30 p-2.5 rounded-xs border border-border/70">
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Latitude</span>
+                    <span className="font-mono text-text-primary text-[11px]">{selectedBranch.latitude || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Longitude</span>
+                    <span className="font-mono text-text-primary text-[11px]">{selectedBranch.longitude || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Created At</span>
+                    <span className="font-mono text-text-secondary text-[11px]">{selectedBranch.created_at || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary block">Record ID</span>
+                    <span className="font-mono text-text-secondary text-[11px]">#{selectedBranch.id}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2 border-t border-border">
+                <Button size="sm" variant="outline" className="h-7 text-[11px] px-3" onClick={() => setSelectedBranch(null)}>
                   Close
                 </Button>
               </div>
