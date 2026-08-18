@@ -9,15 +9,18 @@ import { UsersListPage } from '../../features/users/pages/UsersListPage';
 import { PermissionsPage } from '../../features/permissions/pages/PermissionsPage';
 import { AuthProvider } from '../../features/auth/context/AuthContext';
 import { ProtectedRoute } from '../../components/layout/ProtectedRoute';
+import { ErrorBoundary } from '../../components/layout/ErrorBoundary';
 
 export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+    errorElement: <ErrorBoundary />
   },
   {
     path: '/',
     element: <ProtectedRoute />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         element: <AppShell />,
