@@ -11,8 +11,6 @@ import {
   XCircle,
   Edit,
   ShieldCheck,
-  Calendar,
-  Clock,
   Coins,
   Save,
   X,
@@ -21,6 +19,22 @@ import {
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { companiesApi } from '../../../api/apiservice';
+
+function extractCompanyList(response) {
+  if (!response) return [];
+  if (Array.isArray(response)) return response;
+  if (Array.isArray(response.data)) return response.data;
+  if (Array.isArray(response.companies)) return response.companies;
+  if (Array.isArray(response.data?.companies)) return response.data.companies;
+  if (Array.isArray(response.data?.data)) return response.data.data;
+  if (response.data && typeof response.data === 'object' && (response.data.id || response.data.company_name || response.data.name)) {
+    return [response.data];
+  }
+  if (response && typeof response === 'object' && (response.id || response.company_name || response.name)) {
+    return [response];
+  }
+  return [];
+}
 
 export function CompanyProfileCard() {
   const [company, setCompany] = useState(null);
@@ -33,15 +47,8 @@ export function CompanyProfileCard() {
     try {
       setLoading(true);
       const response = await companiesApi.list();
-      const responseData = response?.data;
-      let list = [];
-      if (Array.isArray(responseData)) {
-        list = responseData;
-      } else if (responseData?.data && Array.isArray(responseData.data)) {
-        list = responseData.data;
-      } else if (responseData && typeof responseData === 'object' && !Array.isArray(responseData)) {
-        list = [responseData];
-      }
+      console.log('[CompanyProfileCard] API response:', response);
+      const list = extractCompanyList(response);
       
       if (list.length > 0) {
         setCompany(list[0]);
@@ -49,7 +56,7 @@ export function CompanyProfileCard() {
         setCompany(null);
       }
     } catch (error) {
-      console.error('Failed to fetch company details:', error);
+      console.error('[CompanyProfileCard] Failed to fetch company details:', error);
       setCompany(null);
     } finally {
       setLoading(false);
@@ -73,10 +80,10 @@ export function CompanyProfileCard() {
     try {
       setSaving(true);
       await companiesApi.update(company.id, editForm);
-      setCompany(editForm);
+      setCompany({ ...editForm });
       setIsEditing(false);
     } catch (error) {
-      console.error('Failed to update company:', error);
+      console.error('[CompanyProfileCard] Failed to update company:', error);
       alert('Failed to update company details. Please try again.');
     } finally {
       setSaving(false);
@@ -106,18 +113,30 @@ export function CompanyProfileCard() {
     );
   }
 
-  // Format full address from schema columns
+  // Format fields robustly
+  const companyName = company.company_name || company.name || 'Company Profile';
+  const companyCode = company.company_code || company.code || 'MAIN-CORP';
+  const legalName = company.legal_name || companyName;
+  const gstin = company.gstin || company.gst;
+  const pan = company.pan;
+  const cin = company.cin;
+  const email = company.email;
+  const phone = company.phone || company.contact;
+  const website = company.website;
+  const currency = company.currency_code || 'INR';
+  const timezone = company.timezone || 'Asia/Kolkata';
+
   const fullAddress = [
-    company.address_line1,
+    company.address_line1 || company.address,
     company.address_line2,
     company.city,
     company.district,
-    company.state_name ? `${company.state_name} (${company.state_code || ''})` : null,
-    company.postal_code,
+    company.state_name ? `${company.state_name} ${company.state_code ? `(${company.state_code})` : ''}` : null,
+    company.postal_code || company.pincode,
     company.country_code
   ].filter(Boolean).join(', ');
 
-  const isActive = company.is_active === 1 || company.is_active === '1' || company.status === 'Active';
+  const isActive = company.is_active === 1 || company.is_active === '1' || company.is_active === true || company.status === 'Active' || company.status === 1;
 
   return (
     <>
@@ -131,14 +150,14 @@ export function CompanyProfileCard() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-[13px] font-bold text-text-primary tracking-tight leading-none">
-                  {company.company_name || company.name || 'Company Profile'}
+                  {companyName}
                 </h2>
-                <span className="text-[10px] font-mono font-medium px-1.5 py-0.2 bg-surface-muted border border-border rounded text-text-secondary">
-                  {company.company_code || company.code || 'MAIN-CORP'}
+                <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 bg-surface-muted border border-border rounded text-text-secondary">
+                  {companyCode}
                 </span>
               </div>
               <p className="text-[10px] text-text-secondary mt-0.5 font-medium">
-                {company.legal_name || 'Enterprise Corporation'}
+                {legalName}
               </p>
             </div>
           </div>
@@ -171,8 +190,8 @@ export function CompanyProfileCard() {
               <FileText className="w-3 h-3 text-primary" />
               <span>GSTIN</span>
             </div>
-            <p className="font-mono font-semibold text-text-primary text-[11px] truncate" title={company.gstin || 'N/A'}>
-              {company.gstin || 'N/A'}
+            <p className="font-mono font-semibold text-text-primary text-[11px] truncate" title={gstin || 'N/A'}>
+              {gstin || 'N/A'}
             </p>
           </div>
 
@@ -182,8 +201,8 @@ export function CompanyProfileCard() {
               <CreditCard className="w-3 h-3 text-primary" />
               <span>PAN</span>
             </div>
-            <p className="font-mono font-semibold text-text-primary text-[11px] truncate" title={company.pan || 'N/A'}>
-              {company.pan || 'N/A'}
+            <p className="font-mono font-semibold text-text-primary text-[11px] truncate" title={pan || 'N/A'}>
+              {pan || 'N/A'}
             </p>
           </div>
 
@@ -193,8 +212,8 @@ export function CompanyProfileCard() {
               <ShieldCheck className="w-3 h-3 text-primary" />
               <span>CIN</span>
             </div>
-            <p className="font-mono font-semibold text-text-primary text-[11px] truncate" title={company.cin || 'N/A'}>
-              {company.cin || 'N/A'}
+            <p className="font-mono font-semibold text-text-primary text-[11px] truncate" title={cin || 'N/A'}>
+              {cin || 'N/A'}
             </p>
           </div>
 
@@ -204,8 +223,8 @@ export function CompanyProfileCard() {
               <Mail className="w-3 h-3 text-primary" />
               <span>Email</span>
             </div>
-            <p className="font-medium text-text-primary truncate" title={company.email || 'N/A'}>
-              {company.email || 'N/A'}
+            <p className="font-medium text-text-primary truncate" title={email || 'N/A'}>
+              {email || 'N/A'}
             </p>
           </div>
 
@@ -215,8 +234,8 @@ export function CompanyProfileCard() {
               <Phone className="w-3 h-3 text-primary" />
               <span>Phone</span>
             </div>
-            <p className="font-medium text-text-primary truncate" title={company.phone || 'N/A'}>
-              {company.phone || 'N/A'}
+            <p className="font-medium text-text-primary truncate" title={phone || 'N/A'}>
+              {phone || 'N/A'}
             </p>
           </div>
 
@@ -227,7 +246,7 @@ export function CompanyProfileCard() {
               <span>Currency / TZ</span>
             </div>
             <p className="font-medium text-text-primary truncate">
-              {company.currency_code || 'INR'} • {company.timezone || 'Asia/Kolkata'}
+              {currency} • {timezone}
             </p>
           </div>
 
@@ -237,8 +256,8 @@ export function CompanyProfileCard() {
               <Globe className="w-3 h-3 text-primary" />
               <span>Website</span>
             </div>
-            <p className="font-medium text-text-primary truncate" title={company.website || 'N/A'}>
-              {company.website || 'N/A'}
+            <p className="font-medium text-text-primary truncate" title={website || 'N/A'}>
+              {website || 'N/A'}
             </p>
           </div>
         </div>
@@ -248,7 +267,7 @@ export function CompanyProfileCard() {
           <MapPin className="w-3.5 h-3.5 text-text-secondary mt-0.5 shrink-0" />
           <div className="truncate">
             <span className="font-semibold text-text-secondary uppercase text-[9px] mr-1.5">Registered Office Address:</span>
-            <span className="text-text-primary font-medium" title={fullAddress}>
+            <span className="text-text-primary font-medium" title={fullAddress || 'N/A'}>
               {fullAddress || 'N/A'}
             </span>
           </div>
@@ -278,8 +297,8 @@ export function CompanyProfileCard() {
                   <label className="block text-text-secondary uppercase text-[9px] font-bold mb-1">Company Name</label>
                   <input 
                     type="text"
-                    value={editForm.company_name || ''}
-                    onChange={(e) => setEditForm({ ...editForm, company_name: e.target.value })}
+                    value={editForm.company_name || editForm.name || ''}
+                    onChange={(e) => setEditForm({ ...editForm, company_name: e.target.value, name: e.target.value })}
                     className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                     required
                   />
@@ -288,8 +307,8 @@ export function CompanyProfileCard() {
                   <label className="block text-text-secondary uppercase text-[9px] font-bold mb-1">Company Code</label>
                   <input 
                     type="text"
-                    value={editForm.company_code || ''}
-                    onChange={(e) => setEditForm({ ...editForm, company_code: e.target.value })}
+                    value={editForm.company_code || editForm.code || ''}
+                    onChange={(e) => setEditForm({ ...editForm, company_code: e.target.value, code: e.target.value })}
                     className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                     required
                   />
@@ -307,8 +326,8 @@ export function CompanyProfileCard() {
                   <label className="block text-text-secondary uppercase text-[9px] font-bold mb-1">GSTIN</label>
                   <input 
                     type="text"
-                    value={editForm.gstin || ''}
-                    onChange={(e) => setEditForm({ ...editForm, gstin: e.target.value })}
+                    value={editForm.gstin || editForm.gst || ''}
+                    onChange={(e) => setEditForm({ ...editForm, gstin: e.target.value, gst: e.target.value })}
                     className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                   />
                 </div>
@@ -343,8 +362,8 @@ export function CompanyProfileCard() {
                   <label className="block text-text-secondary uppercase text-[9px] font-bold mb-1">Phone</label>
                   <input 
                     type="text"
-                    value={editForm.phone || ''}
-                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    value={editForm.phone || editForm.contact || ''}
+                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value, contact: e.target.value })}
                     className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                   />
                 </div>
@@ -352,8 +371,8 @@ export function CompanyProfileCard() {
                   <label className="block text-text-secondary uppercase text-[9px] font-bold mb-1">Address Line 1</label>
                   <input 
                     type="text"
-                    value={editForm.address_line1 || ''}
-                    onChange={(e) => setEditForm({ ...editForm, address_line1: e.target.value })}
+                    value={editForm.address_line1 || editForm.address || ''}
+                    onChange={(e) => setEditForm({ ...editForm, address_line1: e.target.value, address: e.target.value })}
                     className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                   />
                 </div>
@@ -370,8 +389,8 @@ export function CompanyProfileCard() {
                   <label className="block text-text-secondary uppercase text-[9px] font-bold mb-1">State Name</label>
                   <input 
                     type="text"
-                    value={editForm.state_name || ''}
-                    onChange={(e) => setEditForm({ ...editForm, state_name: e.target.value })}
+                    value={editForm.state_name || editForm.state || ''}
+                    onChange={(e) => setEditForm({ ...editForm, state_name: e.target.value, state: e.target.value })}
                     className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                   />
                 </div>
@@ -379,8 +398,8 @@ export function CompanyProfileCard() {
                   <label className="block text-text-secondary uppercase text-[9px] font-bold mb-1">Postal Code</label>
                   <input 
                     type="text"
-                    value={editForm.postal_code || ''}
-                    onChange={(e) => setEditForm({ ...editForm, postal_code: e.target.value })}
+                    value={editForm.postal_code || editForm.pincode || ''}
+                    onChange={(e) => setEditForm({ ...editForm, postal_code: e.target.value, pincode: e.target.value })}
                     className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                   />
                 </div>
