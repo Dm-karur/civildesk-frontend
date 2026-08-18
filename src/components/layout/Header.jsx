@@ -56,22 +56,7 @@ export function Header({ selectedSite, onSiteChange }) {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
         </button>
 
-        {/* User Profile / Logout */}
-        {user && (
-          <div className="flex items-center gap-3 ml-2 border-l border-border pl-4">
-            <div className="hidden md:flex flex-col items-end">
-              <span className="text-[12px] font-medium text-text-primary leading-tight">{user.name || 'User'}</span>
-              <span className="text-[10px] text-text-secondary leading-tight">{user.email || 'Admin'}</span>
-            </div>
-            <button 
-              onClick={logout}
-              className="p-1.5 text-text-secondary hover:text-error hover:bg-error/10 rounded-sm transition-colors flex items-center gap-1 text-[11px] font-medium"
-              title="Log out"
-            >
-              Logout
-            </button>
-          </div>
-        )}
+
       </div>
     </header>
   );
