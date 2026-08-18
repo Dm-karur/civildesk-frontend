@@ -1,14 +1,22 @@
 import { useState, useEffect } from 'react';
-import { User, Save, X, Loader2, Key, Shield } from 'lucide-react';
+import { User, Save, X, Loader2, Key, Shield, ShieldCheck } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { usersApi, branchesApi, rolesApi } from '../../../api/apiservice';
 import { toast } from '../../../components/composite/Toast';
+
+const FALLBACK_ROLES = [
+  { id: 1, name: 'Super Admin / Administrator', role_name: 'Administrator' },
+  { id: 2, name: 'Project Manager', role_name: 'Project Manager' },
+  { id: 3, name: 'Site Engineer', role_name: 'Site Engineer' },
+  { id: 4, name: 'Accountant / Billing', role_name: 'Accountant' },
+  { id: 5, name: 'General Staff', role_name: 'General Staff' },
+];
 
 export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   const isEditing = Boolean(user?.id);
   const [saving, setSaving] = useState(false);
   const [branches, setBranches] = useState([]);
-  const [roles, setRoles] = useState([]);
+  const [roles, setRoles] = useState(FALLBACK_ROLES);
 
   const [formData, setFormData] = useState({
     employee_code: '',
@@ -20,7 +28,8 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
     password: '',
     designation: 'Site Engineer',
     user_type_id: '2',
-    access_level_id: '2', // Default: 2 (Company / Branch Level)
+    access_level_id: '2',
+    role_id: '1', // Default: Role ID 1 (Administrator / Staff)
     user_status_id: '1',
     default_branch_id: '',
     is_super_admin: 0,
@@ -30,18 +39,19 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   });
 
   useEffect(() => {
-    // Load branches & roles for dropdowns
+    // Load branches
     branchesApi.list()
       .then(res => {
         const list = res?.data || res || [];
-        if (Array.isArray(list)) setBranches(list);
+        if (Array.isArray(list) && list.length > 0) setBranches(list);
       })
       .catch(() => {});
 
+    // Load roles
     rolesApi.list()
       .then(res => {
         const list = res?.data || res || [];
-        if (Array.isArray(list)) setRoles(list);
+        if (Array.isArray(list) && list.length > 0) setRoles(list);
       })
       .catch(() => {});
   }, []);
@@ -59,6 +69,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
         designation: user.designation || 'Site Engineer',
         user_type_id: String(user.user_type_id || '2'),
         access_level_id: String(user.access_level_id || (user.is_super_admin ? '1' : '2')),
+        role_id: String(user.role_id || user.roles?.[0]?.id || user.role_ids?.[0] || '1'),
         user_status_id: String(user.user_status_id || '1'),
         default_branch_id: user.default_branch_id || '',
         is_super_admin: user.is_super_admin ? 1 : 0,
@@ -78,6 +89,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
         designation: 'Site Engineer',
         user_type_id: '2',
         access_level_id: '2',
+        role_id: '1',
         user_status_id: '1',
         default_branch_id: '',
         is_super_admin: 0,
@@ -97,7 +109,8 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
       setFormData(prev => ({
         ...prev,
         is_super_admin: isSuper,
-        access_level_id: isSuper ? '1' : prev.access_level_id
+        access_level_id: isSuper ? '1' : prev.access_level_id,
+        role_id: isSuper ? '1' : prev.role_id
       }));
       return;
     }
@@ -113,10 +126,16 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
     setSaving(true);
 
     try {
-      // Build clean payload with access_level_id and typed fields
+      const selectedRoleId = Number(formData.role_id) || 1;
+      const selectedAccessLevel = Number(formData.access_level_id) || (formData.is_super_admin ? 1 : 2);
+
+      // Build complete payload including role_id and access_level_id
       const payload = {
         ...formData,
-        access_level_id: Number(formData.access_level_id) || (formData.is_super_admin ? 1 : 2),
+        role_id: selectedRoleId,
+        role_ids: [selectedRoleId],
+        roles: [selectedRoleId],
+        access_level_id: selectedAccessLevel,
         user_type_id: Number(formData.user_type_id) || 2,
         user_status_id: Number(formData.user_status_id) || 1,
         company_id: Number(formData.company_id) || 1,
@@ -287,7 +306,26 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
                 <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
-                  Access Level (Permission Level) *
+                  User Role *
+                </label>
+                <select
+                  name="role_id"
+                  value={formData.role_id}
+                  onChange={handleChange}
+                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-medium focus:outline-none focus:border-focus"
+                  required
+                >
+                  {roles.map(r => (
+                    <option key={r.id} value={r.id}>
+                      {r.role_name || r.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
+                  Access Level *
                 </label>
                 <select
                   name="access_level_id"
@@ -304,7 +342,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
               </div>
 
               {!isEditing ? (
-                <div>
+                <div className="sm:col-span-2">
                   <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Password *</label>
                   <input 
                     type="password"
@@ -317,7 +355,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
                   />
                 </div>
               ) : (
-                <div>
+                <div className="sm:col-span-2">
                   <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">New Password (optional)</label>
                   <input 
                     type="password"
@@ -339,7 +377,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
                     onChange={handleChange}
                     className="rounded-xs text-primary"
                   />
-                  <span className="text-[10px] font-medium text-text-primary">Super Administrator</span>
+                  <span className="text-[10px] font-medium text-text-primary">Super Administrator Access</span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <input 
