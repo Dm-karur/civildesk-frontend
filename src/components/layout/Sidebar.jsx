@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Briefcase,
@@ -14,9 +14,14 @@ import {
   FileText,
   Settings,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  LogOut,
+  User,
+  Crown
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useAuth } from '../../features/auth/context/AuthContext';
+import { Button } from '../ui/Button';
 
 const NAVIGATION = [
   { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
@@ -188,6 +193,46 @@ function NavItem({ item }) {
 }
 
 export function Sidebar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsProfileOpen(false);
+      }
+    };
+
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isProfileOpen]);
+
+  const initials = user?.name ? user.name.substring(0, 2).toUpperCase() : 'U';
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const handleViewDetails = () => {
+    setIsProfileOpen(false);
+    // navigate('/settings/users/profile'); // Example route
+  };
+
   return (
     <aside className="w-[230px] bg-secondary flex flex-col h-full border-r border-border flex-shrink-0">
       {/* Logo */}
@@ -204,18 +249,78 @@ export function Sidebar() {
       </nav>
 
       {/* User Profile */}
-      <div className="p-3 border-t border-[rgba(255,255,255,0.1)] flex-shrink-0">
-        <div className="flex items-center justify-between px-2 py-1.5 rounded-sm hover:bg-white/5 cursor-pointer transition-colors">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-[11px] flex-shrink-0">
-              JD
+      <div className="p-3 border-t border-[rgba(255,255,255,0.1)] flex-shrink-0 relative" ref={profileRef}>
+        {/* Floating Profile Card */}
+        {isProfileOpen && (
+          <div className="absolute bottom-full left-1.5 right-1.5 mb-2 bg-surface rounded-lg shadow-level-2 border border-border z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+            {/* User Info Section */}
+            <div className="p-4 flex flex-col gap-3">
+              <div className="flex justify-center w-full mb-1">
+                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+                  {initials}
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-1 w-full text-center">
+                <span className="text-[14px] font-semibold text-text-primary truncate w-full">
+                  {user?.name || 'User'}
+                </span>
+                <span className="text-[12px] text-text-secondary truncate w-full">
+                  {user?.email || 'user@example.com'}
+                </span>
+                <span className="text-[12px] text-text-secondary truncate w-full">
+                  {user?.designation || 'Staff'}
+                </span>
+                <div className="mt-1.5 flex justify-center w-full">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
+                    {(user?.user_type_code === 'COMPANY_ADMIN' || user?.is_super_admin) && (
+                      <Crown className="w-2.5 h-2.5 text-amber-500 shrink-0" />
+                    )}
+                    {user?.user_type_code?.replace('_', ' ') || 'User'}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[12px] font-medium text-white truncate leading-tight">John Doe</p>
-              <p className="text-[10px] text-[#C8D1DC] truncate leading-tight mt-0.5">Project Manager</p>
+
+            <div className="h-px bg-border w-full" />
+
+            {/* Actions Section */}
+            <div className="p-2.5 flex gap-2">
+              <Button 
+                variant="outline" 
+                className="flex-1 h-7 text-[11px] px-1"
+                onClick={handleViewDetails}
+              >
+                View Details
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1 h-7 text-[11px] px-1 text-error hover:bg-error/10 hover:border-error/30"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
             </div>
           </div>
-          <ChevronDown className="w-4 h-4 opacity-50 text-white flex-shrink-0 ml-1" />
+        )}
+
+        {/* Trigger */}
+        <div 
+          onClick={() => setIsProfileOpen(!isProfileOpen)}
+          className={clsx(
+            "flex items-center justify-between px-2 py-1.5 rounded-sm cursor-pointer transition-colors",
+            isProfileOpen ? "bg-white/10" : "hover:bg-white/5"
+          )}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-[11px] flex-shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[12px] font-medium text-white truncate leading-tight">{user?.name || 'User'}</p>
+              <p className="text-[10px] text-[#C8D1DC] truncate leading-tight mt-0.5">{user?.designation || 'Staff'}</p>
+            </div>
+          </div>
+          <ChevronDown className={clsx("w-4 h-4 text-white flex-shrink-0 ml-1 transition-transform", isProfileOpen && "rotate-180")} />
         </div>
       </div>
     </aside>
