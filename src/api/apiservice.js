@@ -114,6 +114,20 @@ export const usersApi = {
     delete: (id) => request.delete(`/users/${enc(id)}`),
     remove: (id) => request.delete(`/users/${enc(id)}`),
 };
+export const userTypeMastersApi = { 
+    list: (params) => request.get('/users-user-type-masters', params).catch(() => request.get('/user-types', params)),
+    ...crud('/users-user-type-masters') 
+};
+export const userBranchAccessApi = { ...crud('/user-branch-access') };
+export const accessLevelMastersApi = { 
+    list: (params) => request.get('/user-branch-access-access-level-masters', params).catch(() => request.get('/access-levels', params)),
+    ...crud('/user-branch-access-access-level-masters') 
+};
+export const userRolesApi = { 
+    list: (params) => request.get('/user-roles', params).catch(() => request.get('/roles', params)),
+    ...crud('/user-roles') 
+};
+export const userStatusesApi = { ...crud('/user-statuses') };
 export const rolesApi = {
     list: (params) => request.get('/roles', params),
     get: (id) => request.get(`/roles/${enc(id)}`),

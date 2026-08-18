@@ -1,22 +1,47 @@
 import { useState, useEffect } from 'react';
-import { User, Save, X, Loader2, Key, Shield, ShieldCheck } from 'lucide-react';
+import { User, Save, X, Loader2, Key, Shield, ShieldCheck, Building2, UserCheck } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
-import { usersApi, branchesApi, rolesApi } from '../../../api/apiservice';
+import { 
+  usersApi, 
+  branchesApi, 
+  userTypeMastersApi, 
+  accessLevelMastersApi, 
+  userRolesApi, 
+  userStatusesApi 
+} from '../../../api/apiservice';
 import { toast } from '../../../components/composite/Toast';
-
-const FALLBACK_ROLES = [
-  { id: 1, name: 'Super Admin / Administrator', role_name: 'Administrator' },
-  { id: 2, name: 'Project Manager', role_name: 'Project Manager' },
-  { id: 3, name: 'Site Engineer', role_name: 'Site Engineer' },
-  { id: 4, name: 'Accountant / Billing', role_name: 'Accountant' },
-  { id: 5, name: 'General Staff', role_name: 'General Staff' },
-];
 
 export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   const isEditing = Boolean(user?.id);
   const [saving, setSaving] = useState(false);
+
+  // Master lists fetched from database tables
   const [branches, setBranches] = useState([]);
-  const [roles, setRoles] = useState(FALLBACK_ROLES);
+  const [userTypes, setUserTypes] = useState([
+    { id: 1, type_name: 'Internal Management' },
+    { id: 2, type_name: 'Regular Employee / Staff' },
+    { id: 3, type_name: 'Site Engineer / Contractor' },
+    { id: 4, type_name: 'External Consultant' }
+  ]);
+  const [accessLevels, setAccessLevels] = useState([
+    { id: 1, level_name: 'Level 1 - Super Administrator' },
+    { id: 2, level_name: 'Level 2 - Company Admin' },
+    { id: 3, level_name: 'Level 3 - Branch / Project Manager' },
+    { id: 4, level_name: 'Level 4 - Site Engineer / Staff' }
+  ]);
+  const [roles, setRoles] = useState([
+    { id: 1, role_name: 'Super Admin / Administrator' },
+    { id: 2, role_name: 'Project Manager' },
+    { id: 3, role_name: 'Site Engineer' },
+    { id: 4, role_name: 'Accountant / Billing' },
+    { id: 5, role_name: 'General Staff' }
+  ]);
+  const [statuses, setStatuses] = useState([
+    { id: 1, status_name: 'Active' },
+    { id: 2, status_name: 'Inactive' },
+    { id: 3, status_name: 'Suspended' },
+    { id: 4, status_name: 'Pending Activation' }
+  ]);
 
   const [formData, setFormData] = useState({
     employee_code: '',
@@ -29,7 +54,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
     designation: 'Site Engineer',
     user_type_id: '2',
     access_level_id: '2',
-    role_id: '1', // Default: Role ID 1 (Administrator / Staff)
+    role_id: '1',
     user_status_id: '1',
     default_branch_id: '',
     is_super_admin: 0,
@@ -39,7 +64,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   });
 
   useEffect(() => {
-    // Load branches
+    // Fetch live database tables
     branchesApi.list()
       .then(res => {
         const list = res?.data || res || [];
@@ -47,11 +72,31 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
       })
       .catch(() => {});
 
-    // Load roles
-    rolesApi.list()
+    userTypeMastersApi.list()
+      .then(res => {
+        const list = res?.data || res || [];
+        if (Array.isArray(list) && list.length > 0) setUserTypes(list);
+      })
+      .catch(() => {});
+
+    accessLevelMastersApi.list()
+      .then(res => {
+        const list = res?.data || res || [];
+        if (Array.isArray(list) && list.length > 0) setAccessLevels(list);
+      })
+      .catch(() => {});
+
+    userRolesApi.list()
       .then(res => {
         const list = res?.data || res || [];
         if (Array.isArray(list) && list.length > 0) setRoles(list);
+      })
+      .catch(() => {});
+
+    userStatusesApi.list()
+      .then(res => {
+        const list = res?.data || res || [];
+        if (Array.isArray(list) && list.length > 0) setStatuses(list);
       })
       .catch(() => {});
   }, []);
@@ -128,16 +173,18 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
     try {
       const selectedRoleId = Number(formData.role_id) || 1;
       const selectedAccessLevel = Number(formData.access_level_id) || (formData.is_super_admin ? 1 : 2);
+      const selectedUserType = Number(formData.user_type_id) || 2;
+      const selectedUserStatus = Number(formData.user_status_id) || 1;
 
-      // Build complete payload including role_id and access_level_id
+      // Build complete payload matching all 6 MySQL tables
       const payload = {
         ...formData,
         role_id: selectedRoleId,
         role_ids: [selectedRoleId],
         roles: [selectedRoleId],
         access_level_id: selectedAccessLevel,
-        user_type_id: Number(formData.user_type_id) || 2,
-        user_status_id: Number(formData.user_status_id) || 1,
+        user_type_id: selectedUserType,
+        user_status_id: selectedUserStatus,
         company_id: Number(formData.company_id) || 1,
         default_branch_id: formData.default_branch_id ? Number(formData.default_branch_id) : null,
         is_super_admin: formData.is_super_admin ? 1 : 0,
@@ -187,9 +234,11 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-4 text-[11px] space-y-3.5 max-h-[80vh] overflow-y-auto">
+          {/* Section 1: User Account & Identity */}
           <div>
-            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">
-              1. User Account & Identity
+            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
+              <User className="w-3 h-3 text-primary" />
+              <span>1. User Account & Identity (`users`)</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
@@ -241,9 +290,11 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
             </div>
           </div>
 
+          {/* Section 2: Contact, Designation & Type */}
           <div>
-            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">
-              2. Contact & Role Details
+            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
+              <UserCheck className="w-3 h-3 text-primary" />
+              <span>2. Contact & Type (`users_user_type_masters`)</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
@@ -281,6 +332,31 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
                 />
               </div>
               <div>
+                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">User Type Master</label>
+                <select
+                  name="user_type_id"
+                  value={formData.user_type_id}
+                  onChange={handleChange}
+                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
+                >
+                  {userTypes.map(ut => (
+                    <option key={ut.id} value={ut.id}>
+                      {ut.type_name || ut.name || `Type #${ut.id}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Branch Access & Level */}
+          <div>
+            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
+              <Building2 className="w-3 h-3 text-primary" />
+              <span>3. Branch & Access Level (`user_branch_access_access_level_masters`)</span>
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
                 <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Default Branch</label>
                 <select
                   name="default_branch_id"
@@ -296,17 +372,37 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
+                  Access Level Master *
+                </label>
+                <select
+                  name="access_level_id"
+                  value={formData.access_level_id}
+                  onChange={handleChange}
+                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-medium focus:outline-none focus:border-focus"
+                  required
+                >
+                  {accessLevels.map(al => (
+                    <option key={al.id} value={al.id}>
+                      {al.level_name || al.name || `Access Level #${al.id}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
+          {/* Section 4: Role & Status */}
           <div>
-            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">
-              3. Security & Access Control
+            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
+              <Shield className="w-3 h-3 text-primary" />
+              <span>4. Role & Status (`user_roles` & `user_statuses`)</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
                 <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
-                  User Role *
+                  Assigned User Role *
                 </label>
                 <select
                   name="role_id"
@@ -325,19 +421,20 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
 
               <div>
                 <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
-                  Access Level *
+                  User Status *
                 </label>
                 <select
-                  name="access_level_id"
-                  value={formData.access_level_id}
+                  name="user_status_id"
+                  value={formData.user_status_id}
                   onChange={handleChange}
                   className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-medium focus:outline-none focus:border-focus"
                   required
                 >
-                  <option value="1">Level 1 - Super Administrator</option>
-                  <option value="2">Level 2 - Company Admin</option>
-                  <option value="3">Level 3 - Branch / Project Manager</option>
-                  <option value="4">Level 4 - Site Engineer / Staff</option>
+                  {statuses.map(st => (
+                    <option key={st.id} value={st.id}>
+                      {st.status_name || st.name || `Status #${st.id}`}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -349,7 +446,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Enter password..."
+                    placeholder="Enter secure password..."
                     className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                     required
                   />
