@@ -9,8 +9,8 @@ export function BranchListPage() {
         title="Branch Master" 
         breadcrumbs={[
           { label: 'Dashboard', to: '/dashboard' },
-          { label: 'Settings', to: '/settings' },
-          { label: 'Branch' }
+          { label: 'Administration', to: '/administration/branches' },
+          { label: 'Branches' }
         ]}
       />
       <div className="flex flex-col h-full">

@@ -111,7 +111,7 @@ export function PermissionsPage() {
         title="Roles & Permissions" 
         breadcrumbs={[
           { label: 'Dashboard', to: '/dashboard' },
-          { label: 'Settings', to: '/settings/company-branch' },
+          { label: 'Administration', to: '/administration/roles-permissions' },
           { label: 'Roles & Permissions' }
         ]}
       />

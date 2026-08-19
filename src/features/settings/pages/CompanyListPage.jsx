@@ -9,8 +9,8 @@ export function CompanyListPage() {
         title="Company Master" 
         breadcrumbs={[
           { label: 'Dashboard', to: '/dashboard' },
-          { label: 'Settings', to: '/settings' },
-          { label: 'Company' }
+          { label: 'Administration', to: '/administration/companies' },
+          { label: 'Companies' }
         ]}
       />
       <div className="flex flex-col h-full">

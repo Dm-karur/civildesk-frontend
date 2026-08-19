@@ -4,7 +4,8 @@ import { DashboardPage } from '../../features/dashboard/pages/DashboardPage';
 import { LoginPage } from '../../features/auth/pages/LoginPage';
 import { ProjectsListPage } from '../../features/projects/pages/ProjectsListPage';
 import { ClientsListPage } from '../../features/clients/pages/ClientsListPage';
-import { CompanyBranchPage } from '../../features/settings/pages/CompanyBranchPage';
+import { CompanyListPage } from '../../features/settings/pages/CompanyListPage';
+import { BranchListPage } from '../../features/settings/pages/BranchListPage';
 import { UsersListPage } from '../../features/users/pages/UsersListPage';
 import { PermissionsPage } from '../../features/permissions/pages/PermissionsPage';
 import { AuthProvider } from '../../features/auth/context/AuthContext';
@@ -46,32 +47,49 @@ export const router = createBrowserRouter([
             element: <Navigate to="/project-masters/clients" replace />,
           },
           {
-            path: 'settings/company-branch',
-            element: <CompanyBranchPage />,
+            path: 'administration/companies',
+            element: <CompanyListPage />,
           },
           {
-            path: 'settings/users',
+            path: 'administration/branches',
+            element: <BranchListPage />,
+          },
+          {
+            path: 'administration/users',
             element: <UsersListPage />,
           },
           {
+            path: 'administration/roles-permissions',
+            element: <PermissionsPage />,
+          },
+          // Redirects for legacy routes
+          {
+            path: 'settings/company-branch',
+            element: <Navigate to="/administration/companies" replace />,
+          },
+          {
+            path: 'settings/users',
+            element: <Navigate to="/administration/users" replace />,
+          },
+          {
             path: 'users',
-            element: <Navigate to="/settings/users" replace />,
+            element: <Navigate to="/administration/users" replace />,
           },
           {
             path: 'settings/permissions',
-            element: <PermissionsPage />,
+            element: <Navigate to="/administration/roles-permissions" replace />,
           },
           {
             path: 'permissions',
-            element: <Navigate to="/settings/permissions" replace />,
+            element: <Navigate to="/administration/roles-permissions" replace />,
           },
           {
             path: 'settings/company',
-            element: <Navigate to="/settings/company-branch" replace />,
+            element: <Navigate to="/administration/companies" replace />,
           },
           {
             path: 'settings/branch',
-            element: <Navigate to="/settings/company-branch" replace />,
+            element: <Navigate to="/administration/branches" replace />,
           },
           // Placeholders for other routes
           {

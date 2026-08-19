@@ -10,13 +10,16 @@ const SITE_OPTIONS = [
   { label: 'Highway Project Phase 1', value: 'site-4' },
 ];
 
-export function Header({ selectedSite, onSiteChange }) {
+export function Header({ selectedSite, onSiteChange, onMenuClick }) {
   const { user, logout } = useAuth();
   
   return (
     <header className="h-16 bg-surface border-b border-border flex items-center justify-between px-6 flex-shrink-0">
       <div className="flex items-center gap-4">
-        <button className="p-2 -ml-2 text-text-secondary hover:text-text-primary hover:bg-surface-muted rounded-sm transition-colors md:hidden">
+        <button 
+          onClick={onMenuClick}
+          className="p-2 -ml-2 text-text-secondary hover:text-text-primary hover:bg-surface-muted rounded-sm transition-colors lg:hidden"
+        >
           <Menu className="w-5 h-5" />
         </button>
 

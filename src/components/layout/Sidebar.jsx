@@ -24,7 +24,13 @@ import {
   Receipt,
   LineChart,
   MessageSquare,
-  Globe
+  Globe,
+  FolderCog,
+  UserCog,
+  Boxes,
+  Store,
+  Landmark,
+  Shield
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from '../../features/auth/context/AuthContext';
@@ -255,19 +261,84 @@ const NAVIGATION = [
       { name: 'Client Communications', to: '/client-portal/communications' }
     ]
   },
-  { isDivider: true, id: 'div-system' },
+  { isDivider: true, id: 'div-masters' },
+  { isSection: true, name: 'Masters' },
   {
-    name: 'Settings',
+    name: 'Project Masters',
+    icon: FolderCog,
+    submenus: [
+      { name: 'Clients', to: '/masters/clients' },
+      { name: 'Project Types', to: '/masters/project-types' },
+      { name: 'Project Statuses', to: '/masters/project-statuses' },
+      { name: 'Financial Years', to: '/masters/financial-years' },
+      { name: 'Work Categories', to: '/masters/work-categories' },
+      { name: 'Units', to: '/masters/project-units' }
+    ]
+  },
+  {
+    name: 'Labour Masters',
+    icon: UserCog,
+    submenus: [
+      { name: 'Labour Types', to: '/masters/labour-types' },
+      { name: 'Labour Categories', to: '/masters/labour-categories' },
+      { name: 'Trades', to: '/masters/trades' },
+      { name: 'Wage Rates', to: '/masters/wage-rates' },
+      { name: 'Crews', to: '/masters/crews' }
+    ]
+  },
+  {
+    name: 'Material Masters',
+    icon: Boxes,
+    submenus: [
+      { name: 'Material Categories', to: '/masters/material-categories' },
+      { name: 'Materials', to: '/masters/materials' },
+      { name: 'Brands', to: '/masters/brands' },
+      { name: 'Units', to: '/masters/material-units' },
+      { name: 'Warehouses', to: '/masters/warehouses' }
+    ]
+  },
+  {
+    name: 'Procurement Masters',
+    icon: Store,
+    submenus: [
+      { name: 'Vendors', to: '/masters/vendors' },
+      { name: 'Payment Terms', to: '/masters/payment-terms' },
+      { name: 'Tax Rates', to: '/masters/tax-rates' }
+    ]
+  },
+  {
+    name: 'Finance Masters',
+    icon: Landmark,
+    submenus: [
+      { name: 'Expense Categories', to: '/masters/expense-categories' },
+      { name: 'Income Categories', to: '/masters/income-categories' },
+      { name: 'Banks', to: '/masters/banks' },
+      { name: 'Accounts', to: '/masters/accounts' },
+      { name: 'Cost Heads', to: '/masters/cost-heads' }
+    ]
+  },
+  { isDivider: true, id: 'div-administration' },
+  { isSection: true, name: 'Administration' },
+  {
+    name: 'Administration',
     icon: Settings,
     submenus: [
-      { name: 'Company & Branch', to: '/settings/company-branch' },
-      { name: 'User Master', to: '/settings/users' },
-      { name: 'Roles & Permissions', to: '/settings/permissions' }
+      { name: 'Companies', to: '/administration/companies' },
+      { name: 'Branches', to: '/administration/branches' },
+      { name: 'Users', to: '/administration/users' },
+      { name: 'Roles & Permissions', to: '/administration/roles-permissions' },
+      { name: 'Approval Workflows', to: '/administration/approval-workflows' },
+      { name: 'Numbering Settings', to: '/administration/numbering-settings' },
+      { name: 'Notification Settings', to: '/administration/notification-settings' },
+      { name: 'Email Settings', to: '/administration/email-settings' },
+      { name: 'WhatsApp Settings', to: '/administration/whatsapp-settings' },
+      { name: 'Audit Logs', to: '/administration/audit-logs' },
+      { name: 'System Settings', to: '/administration/system-settings' }
     ]
   }
 ];
 
-function NavItem({ item, isOpen, onToggle }) {
+function NavItem({ item, isOpen, onToggle, onCloseMobile }) {
   const location = useLocation();
   const hasSubmenu = item.submenus && item.submenus.length > 0;
 
@@ -279,6 +350,7 @@ function NavItem({ item, isOpen, onToggle }) {
     return (
       <NavLink
         to={item.to}
+        onClick={onCloseMobile}
         className={({ isActive }) =>
           clsx(
             'flex items-center gap-3 px-2 h-10 rounded-sm font-medium transition-colors text-[13px] flex-shrink-0',
@@ -318,6 +390,7 @@ function NavItem({ item, isOpen, onToggle }) {
             <NavLink
               key={sub.name}
               to={sub.to}
+              onClick={onCloseMobile}
               className={({ isActive }) =>
                 clsx(
                   'flex items-center px-2 py-1.5 rounded-sm font-medium transition-colors text-[12px] relative flex-shrink-0',
@@ -336,7 +409,7 @@ function NavItem({ item, isOpen, onToggle }) {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ isMobileOpen, onCloseMobile }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -403,10 +476,26 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-[230px] bg-secondary flex flex-col h-full border-r border-border flex-shrink-0">
-      {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-[rgba(255,255,255,0.1)] flex-shrink-0">
-        <span className="text-white font-bold text-[18px] tracking-tight">CIVIL DESK</span>
+    <>
+      {/* Mobile overlay */}
+      {isMobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onCloseMobile}
+        />
+      )}
+
+      {/* Sidebar container */}
+      <aside 
+        className={clsx(
+          "bg-secondary flex flex-col h-full border-r border-[rgba(255,255,255,0.1)] flex-shrink-0 z-50 transition-transform duration-300 w-[230px]",
+          "fixed inset-y-0 left-0 lg:static lg:translate-x-0",
+          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Logo */}
+        <div className="h-16 flex items-center px-5 border-b border-[rgba(255,255,255,0.1)] flex-shrink-0">
+          <span className="text-white font-bold text-[18px] tracking-tight">CIVIL DESK</span>
       </div>
 
       {/* Navigation */}
@@ -431,6 +520,7 @@ export function Sidebar() {
               item={item} 
               isOpen={openMenu === item.name}
               onToggle={() => handleToggleMenu(item.name)}
+              onCloseMobile={onCloseMobile}
             />
           );
         })}
@@ -510,7 +600,8 @@ export function Sidebar() {
           </div>
           <ChevronDown className={clsx("w-4 h-4 text-white flex-shrink-0 ml-1 transition-transform", isProfileOpen && "rotate-180")} />
         </div>
-      </div>
-    </aside>
+        </div>
+      </aside>
+    </>
   );
 }

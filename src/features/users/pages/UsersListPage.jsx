@@ -15,8 +15,8 @@ export function UsersListPage() {
         title="User Master" 
         breadcrumbs={[
           { label: 'Dashboard', to: '/dashboard' },
-          { label: 'Settings', to: '/settings/company-branch' },
-          { label: 'User Master' }
+          { label: 'Administration', to: '/administration/users' },
+          { label: 'Users' }
         ]}
       />
       <div className="flex flex-col h-full overflow-hidden">
