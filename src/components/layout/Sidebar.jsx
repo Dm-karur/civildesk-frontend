@@ -17,7 +17,14 @@ import {
   ChevronRight,
   LogOut,
   User,
-  Crown
+  Crown,
+  CalendarDays,
+  ShoppingCart,
+  Wrench,
+  Receipt,
+  LineChart,
+  MessageSquare,
+  Globe
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from '../../features/auth/context/AuthContext';
@@ -29,88 +36,226 @@ const NAVIGATION = [
     name: 'Projects',
     icon: Briefcase,
     submenus: [
-      { name: 'Project Master', to: '/projects' },
-      { name: 'Clients', to: '/project-masters/clients' },
-      { name: 'Project Types', to: '/project-masters/types' },
-      { name: 'Project Status', to: '/project-masters/status' },
-      { name: 'Project Team', to: '/project-masters/team' },
-      { name: 'Financial Year', to: '/project-masters/financial-year' },
-      { name: 'Units', to: '/project-masters/units' },
-      { name: 'Work Categories', to: '/project-masters/work-categories' }
+      { name: 'Project Register', to: '/projects/register' },
+      { name: 'Add New Project', to: '/projects/new' },
+      { name: 'Project Clients', to: '/projects/clients' },
+      { name: 'Project Team', to: '/projects/team' },
+      { name: 'Project Overview', to: '/projects/overview' },
+      { name: 'Project Documents', to: '/projects/documents' },
+      { name: 'Project Milestones', to: '/projects/milestones' },
+      { name: 'Project Status History', to: '/projects/status-history' }
     ]
   },
   {
-    name: 'Site Master',
+    name: 'Sites & Locations',
     icon: Building2,
     submenus: [
-      { name: 'Site List', to: '/sites/list' },
-      { name: 'Site Assignment', to: '/sites/assignment' }
+      { name: 'Site Register', to: '/sites/register' },
+      { name: 'Locations / Zones', to: '/sites/locations' },
+      { name: 'Work Locations', to: '/sites/work-locations' },
+      { name: 'Site Team Assignment', to: '/sites/team-assignment' },
+      { name: 'Site Instructions', to: '/sites/instructions' },
+      { name: 'Site Documents', to: '/sites/documents' }
     ]
   },
   {
-    name: 'BOQ & Budget',
+    name: 'BOQ & Project Budget',
     icon: ClipboardList,
     submenus: [
-      { name: 'BOQ List', to: '/boq/list' },
-      { name: 'Budget Allocation', to: '/boq/budget' }
+      { name: 'BOQ Register', to: '/boq/register' },
+      { name: 'BOQ Sections', to: '/boq/sections' },
+      { name: 'BOQ Items', to: '/boq/items' },
+      { name: 'Budget Summary', to: '/boq/budget-summary' },
+      { name: 'Budget Revisions', to: '/boq/budget-revisions' },
+      { name: 'Variation Orders', to: '/boq/variation-orders' },
+      { name: 'Change Approval', to: '/boq/change-approval' },
+      { name: 'Drawing Quantity Takeoff', to: '/boq/takeoff' },
+      { name: 'Takeoff Review', to: '/boq/takeoff-review' },
+      { name: 'Convert Takeoff to BOQ', to: '/boq/convert-takeoff' }
+    ]
+  },
+  {
+    name: 'Project Planning',
+    icon: CalendarDays,
+    submenus: [
+      { name: 'Project Activities', to: '/planning/activities' },
+      { name: 'Work Programme', to: '/planning/programme' },
+      { name: 'Activity–BOQ Mapping', to: '/planning/mapping' },
+      { name: 'Planned vs Completed', to: '/planning/planned-vs-completed' },
+      { name: 'Look-Ahead Planning', to: '/planning/look-ahead' },
+      { name: 'Material Requirements', to: '/planning/material-req' },
+      { name: 'Material Forecast', to: '/planning/material-forecast' },
+      { name: 'Shortage Predictions', to: '/planning/shortage' },
+      { name: 'Planning Alerts', to: '/planning/alerts' }
     ]
   },
   {
     name: 'Labour & Attendance',
     icon: Users,
     submenus: [
+      { name: 'Labour Register', to: '/labour/register' },
+      { name: 'Labour Deployment', to: '/labour/deployment' },
       { name: 'Daily Attendance', to: '/labour/attendance' },
-      { name: 'Labour Payments', to: '/labour/payments' }
+      { name: 'Attendance Exceptions', to: '/labour/exceptions' },
+      { name: 'Timesheets', to: '/labour/timesheets' },
+      { name: 'Overtime', to: '/labour/overtime' },
+      { name: 'Leave Management', to: '/labour/leave' },
+      { name: 'Daily Wages', to: '/labour/wages' },
+      { name: 'Manpower Cost', to: '/labour/cost' },
+      { name: 'Wage Approval', to: '/labour/approval' },
+      { name: 'Labour Reports', to: '/labour/reports' }
     ]
   },
   {
-    name: 'Material Management',
+    name: 'Materials & Inventory',
     icon: Package,
     submenus: [
-      { name: 'Inventory', to: '/materials/inventory' },
-      { name: 'Purchase Orders', to: '/materials/po' }
+      { name: 'Material Catalogue', to: '/materials/catalogue' },
+      { name: 'Stock Overview', to: '/materials/overview' },
+      { name: 'Project Stock', to: '/materials/project-stock' },
+      { name: 'Material Requests', to: '/materials/requests' },
+      { name: 'Stock Receipts', to: '/materials/receipts' },
+      { name: 'Stock Issues', to: '/materials/issues' },
+      { name: 'Stock Transfers', to: '/materials/transfers' },
+      { name: 'Material Returns', to: '/materials/returns' },
+      { name: 'Stock Adjustments', to: '/materials/adjustments' },
+      { name: 'Delivery Challans', to: '/materials/challans' },
+      { name: 'Material Consumption', to: '/materials/consumption' },
+      { name: 'Stock Ledger', to: '/materials/ledger' }
     ]
   },
   {
-    name: 'Daily Operations',
-    icon: Activity,
+    name: 'Procurement',
+    icon: ShoppingCart,
     submenus: [
-      { name: 'DPR', to: '/operations/dpr' },
-      { name: 'Site Notes', to: '/operations/notes' }
+      { name: 'Purchase Requisitions', to: '/procurement/requisitions' },
+      { name: 'Requisition Approval', to: '/procurement/req-approval' },
+      { name: 'Request for Quotation', to: '/procurement/rfq' },
+      { name: 'Vendor Quotations', to: '/procurement/quotations' },
+      { name: 'Quotation Comparison', to: '/procurement/comparison' },
+      { name: 'Purchase Orders', to: '/procurement/po' },
+      { name: 'Purchase Order Approval', to: '/procurement/po-approval' },
+      { name: 'Goods Receipt', to: '/procurement/grn' },
+      { name: 'Vendor Invoices', to: '/procurement/invoices' },
+      { name: 'Purchase Returns', to: '/procurement/returns' },
+      { name: 'Procurement Tracking', to: '/procurement/tracking' }
+    ]
+  },
+  {
+    name: 'Daily Site Operations',
+    icon: Wrench,
+    submenus: [
+      { name: 'Daily Work Report', to: '/operations/dpr' },
+      { name: 'Work Completion Entry', to: '/operations/completion' },
+      { name: 'Progress Measurements', to: '/operations/measurements' },
+      { name: 'Manpower Usage', to: '/operations/manpower' },
+      { name: 'Equipment Usage', to: '/operations/equipment' },
+      { name: 'Material Usage', to: '/operations/material' },
+      { name: 'Delays & Issues', to: '/operations/issues' },
+      { name: 'Site Photos', to: '/operations/photos' },
+      { name: 'Daily Report Approval', to: '/operations/approval' },
+      { name: 'Daily Progress History', to: '/operations/history' }
     ]
   },
   {
     name: 'Subcontract Management',
     icon: Handshake,
     submenus: [
-      { name: 'Contracts', to: '/subcontracts/list' },
-      { name: 'Billing', to: '/subcontracts/billing' }
+      { name: 'Subcontractors', to: '/subcontracts/list' },
+      { name: 'Work Orders', to: '/subcontracts/orders' },
+      { name: 'Work Order Approval', to: '/subcontracts/order-approval' },
+      { name: 'Work Measurements', to: '/subcontracts/measurements' },
+      { name: 'Measurement Certificates', to: '/subcontracts/certificates' },
+      { name: 'RA Bills', to: '/subcontracts/ra-bills' },
+      { name: 'Bill Approval', to: '/subcontracts/bill-approval' },
+      { name: 'Subcontractor Payments', to: '/subcontracts/payments' },
+      { name: 'Work Completion', to: '/subcontracts/completion' },
+      { name: 'Retention Register', to: '/subcontracts/retention' },
+      { name: 'Subcontract Reports', to: '/subcontracts/reports' }
     ]
   },
   {
-    name: 'Project Expenses',
+    name: 'Client Billing & Receivables',
+    icon: Receipt,
+    submenus: [
+      { name: 'Client Contracts', to: '/billing/contracts' },
+      { name: 'Contract Value Register', to: '/billing/value' },
+      { name: 'Client Advances', to: '/billing/advances' },
+      { name: 'Advance Approval', to: '/billing/advance-approval' },
+      { name: 'Client Invoice Register', to: '/billing/invoices' },
+      { name: 'Progress Billing', to: '/billing/progress' },
+      { name: 'Receipt Register', to: '/billing/receipts' },
+      { name: 'Receipt Allocation', to: '/billing/allocation' },
+      { name: 'Outstanding Receivables', to: '/billing/outstanding' },
+      { name: 'Retention Receivables', to: '/billing/retention' },
+      { name: 'Client Statement', to: '/billing/statement' }
+    ]
+  },
+  {
+    name: 'Finance & Cost Control',
     icon: Wallet,
     submenus: [
-      { name: 'Petty Cash', to: '/expenses/petty-cash' },
-      { name: 'Invoices', to: '/expenses/invoices' }
+      { name: 'Project Cost Summary', to: '/finance/cost-summary' },
+      { name: 'Budget vs Actual', to: '/finance/budget-vs-actual' },
+      { name: 'Material Costs', to: '/finance/material-costs' },
+      { name: 'Labour Costs', to: '/finance/labour-costs' },
+      { name: 'Subcontract Costs', to: '/finance/subcontract-costs' },
+      { name: 'Equipment Costs', to: '/finance/equipment-costs' },
+      { name: 'Other Expenses', to: '/finance/expenses' },
+      { name: 'Income Register', to: '/finance/income' },
+      { name: 'Expense Register', to: '/finance/expense-register' },
+      { name: 'Vendor Payables', to: '/finance/payables' },
+      { name: 'Payment Register', to: '/finance/payment-register' },
+      { name: 'Project Profitability', to: '/finance/profitability' },
+      { name: 'Cash Flow', to: '/finance/cash-flow' }
     ]
   },
   {
-    name: 'Approvals',
-    icon: CheckSquare,
+    name: 'Reports & Analytics',
+    icon: LineChart,
     submenus: [
-      { name: 'Pending', to: '/approvals/pending' },
-      { name: 'History', to: '/approvals/history' }
+      { name: 'Project Progress Report', to: '/reports/progress' },
+      { name: 'BOQ Progress Report', to: '/reports/boq-progress' },
+      { name: 'Budget vs Actual Report', to: '/reports/budget-vs-actual' },
+      { name: 'Material Consumption Report', to: '/reports/material-consumption' },
+      { name: 'Material Shortage Report', to: '/reports/material-shortage' },
+      { name: 'Labour Deployment Report', to: '/reports/labour-deployment' },
+      { name: 'Labour Cost Report', to: '/reports/labour-cost' },
+      { name: 'Subcontractor Report', to: '/reports/subcontractor' },
+      { name: 'Client Receivable Report', to: '/reports/receivable' },
+      { name: 'Vendor Payable Report', to: '/reports/payable' },
+      { name: 'Project Profitability Report', to: '/reports/profitability' },
+      { name: 'Daily Site Report', to: '/reports/daily-site' },
+      { name: 'Management Summary', to: '/reports/management-summary' }
+    ]
+  },
+  { isDivider: true, id: 'div-utilities' },
+  { isSection: true, name: 'Utilities' },
+  {
+    name: 'Communication',
+    icon: MessageSquare,
+    submenus: [
+      { name: 'Project Messages', to: '/communication/project-messages' },
+      { name: 'Client Updates', to: '/communication/client-updates' },
+      { name: 'Document Sharing', to: '/communication/document-sharing' },
+      { name: 'Approval Requests', to: '/communication/approval-requests' },
+      { name: 'WhatsApp History', to: '/communication/whatsapp-history' },
+      { name: 'Email History', to: '/communication/email-history' }
     ]
   },
   {
-    name: 'Report',
-    icon: FileText,
+    name: 'Client Portal',
+    icon: Globe,
     submenus: [
-      { name: 'Financial', to: '/reports/financial' },
-      { name: 'Progress', to: '/reports/progress' }
+      { name: 'Client Users', to: '/client-portal/users' },
+      { name: 'Portal Access', to: '/client-portal/access' },
+      { name: 'Shared Projects', to: '/client-portal/shared-projects' },
+      { name: 'Shared Documents', to: '/client-portal/shared-documents' },
+      { name: 'Client Approvals', to: '/client-portal/approvals' },
+      { name: 'Client Communications', to: '/client-portal/communications' }
     ]
   },
+  { isDivider: true, id: 'div-system' },
   {
     name: 'Settings',
     icon: Settings,
@@ -119,11 +264,10 @@ const NAVIGATION = [
       { name: 'User Master', to: '/settings/users' },
       { name: 'Roles & Permissions', to: '/settings/permissions' }
     ]
-  },
+  }
 ];
 
-function NavItem({ item }) {
-  const [expanded, setExpanded] = useState(false);
+function NavItem({ item, isOpen, onToggle }) {
   const location = useLocation();
   const hasSubmenu = item.submenus && item.submenus.length > 0;
 
@@ -153,10 +297,10 @@ function NavItem({ item }) {
   return (
     <div className="flex flex-col flex-shrink-0">
       <button
-        onClick={() => setExpanded(!expanded)}
+        onClick={onToggle}
         className={clsx(
           'flex items-center justify-between px-2 h-10 rounded-sm font-medium transition-colors text-[13px] w-full flex-shrink-0',
-          expanded || isActive
+          isActive
             ? 'bg-primary text-white'
             : 'text-[#C8D1DC] hover:bg-white/5 hover:text-white'
         )}
@@ -165,10 +309,10 @@ function NavItem({ item }) {
           <item.icon className="w-5 h-5 flex-shrink-0" />
           <span className="truncate">{item.name}</span>
         </div>
-        {expanded ? <ChevronDown className="w-4 h-4 opacity-50 flex-shrink-0 ml-1" /> : <ChevronRight className="w-4 h-4 opacity-50 flex-shrink-0 ml-1" />}
+        {isOpen ? <ChevronDown className="w-4 h-4 opacity-50 flex-shrink-0 ml-1" /> : <ChevronRight className="w-4 h-4 opacity-50 flex-shrink-0 ml-1" />}
       </button>
 
-      {expanded && (
+      {isOpen && (
         <div className="flex flex-col gap-0.5 mt-0.5 pl-8 pr-1 flex-shrink-0">
           {item.submenus.map((sub) => (
             <NavLink
@@ -194,9 +338,34 @@ function NavItem({ item }) {
 
 export function Sidebar() {
   const { user, logout } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
+
+  // Single source of truth for the currently expanded accordion parent
+  const [openMenu, setOpenMenu] = useState(() => {
+    const activeItem = NAVIGATION.find(item => 
+      item.submenus && item.submenus.some(sub => location.pathname.startsWith(sub.to))
+    );
+    return activeItem ? activeItem.name : null;
+  });
+
+  // Sync open menu with current route changes
+  useEffect(() => {
+    const activeItem = NAVIGATION.find(item => 
+      item.submenus && item.submenus.some(sub => location.pathname.startsWith(sub.to))
+    );
+    if (activeItem) {
+      setOpenMenu(activeItem.name);
+    } else {
+      setOpenMenu(null);
+    }
+  }, [location.pathname]);
+
+  const handleToggleMenu = (menuName) => {
+    setOpenMenu(prev => prev === menuName ? null : menuName);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -243,9 +412,28 @@ export function Sidebar() {
       {/* Navigation */}
       {/* Using standard webkit scrollbar hiding via custom class to remove visible scrollbar but keep scrollability */}
       <nav className="flex-1 min-h-0 overflow-y-auto py-3 px-2 flex flex-col gap-0.5 scrollbar-hide">
-        {NAVIGATION.map((item) => (
-          <NavItem key={item.name} item={item} />
-        ))}
+        {NAVIGATION.map((item, index) => {
+          if (item.isDivider) {
+            return <div key={item.id || `div-${index}`} className="h-px bg-[rgba(255,255,255,0.1)] my-2 mx-2 flex-shrink-0" />;
+          }
+          if (item.isSection) {
+            return (
+              <div key={`sec-${index}`} className="px-2 pt-3 pb-1 flex-shrink-0">
+                <span className="text-[10px] font-semibold text-[#C8D1DC]/50 uppercase tracking-wider">
+                  {item.name}
+                </span>
+              </div>
+            );
+          }
+          return (
+            <NavItem 
+              key={item.name} 
+              item={item} 
+              isOpen={openMenu === item.name}
+              onToggle={() => handleToggleMenu(item.name)}
+            />
+          );
+        })}
       </nav>
 
       {/* User Profile */}
