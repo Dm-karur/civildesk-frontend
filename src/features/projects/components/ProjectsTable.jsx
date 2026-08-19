@@ -80,12 +80,13 @@ export function ProjectsTable({ searchQuery = '', statusFilter = 'all', clientFi
         <thead className="bg-surface-muted text-text-secondary text-[11px] uppercase font-semibold border-b border-border tracking-wider">
           <tr>
             <th className="px-2 py-1.5 w-10 text-center">#</th>
-            <th className="px-2 py-1.5 w-24">Pro-Code</th>
+            <th className="px-2 py-1.5 w-24">Project Code</th>
             <th className="px-2 py-1.5 w-48">Project Name</th>
             <th className="px-2 py-1.5 w-36">Client</th>
             <th className="px-2 py-1.5 w-32">Project Type</th>
             <th className="px-2 py-1.5 w-28 text-center">Status</th>
-            <th className="px-2 py-1.5 w-32">Timeline</th>
+            <th className="px-2 py-1.5 w-28">Start Date</th>
+            <th className="px-2 py-1.5 w-28">End Date</th>
             <th className="px-2 py-1.5 text-right w-28">Budget (₹)</th>
             <th className="px-2 py-1.5 text-center w-20">Actions</th>
           </tr>
@@ -93,13 +94,13 @@ export function ProjectsTable({ searchQuery = '', statusFilter = 'all', clientFi
         <tbody className="divide-y divide-border">
           {loading ? (
             <tr>
-              <td colSpan="9" className="text-center py-6 text-text-muted text-[12px]">
+              <td colSpan="10" className="text-center py-6 text-text-muted text-[12px]">
                 Loading projects from database...
               </td>
             </tr>
           ) : filteredProjects.length === 0 ? (
             <tr>
-              <td colSpan="9" className="text-center py-6 text-text-muted text-[12px]">
+              <td colSpan="10" className="text-center py-6 text-text-muted text-[12px]">
                 No projects found in database.
               </td>
             </tr>
@@ -125,19 +126,19 @@ export function ProjectsTable({ searchQuery = '', statusFilter = 'all', clientFi
                   <td className="px-2 py-1 text-center">
                     <Badge 
                       variant={getStatusType(status)}
-                      className="text-[9px] font-bold uppercase tracking-wider h-5 px-1.5 inline-flex items-center gap-1 leading-none"
+                      className="text-[8px] font-bold uppercase tracking-wider h-4 px-1.5 inline-flex items-center gap-0.5 leading-none"
                     >
-                      {status === 'In Progress' && <PlayCircle className="w-3 h-3" />}
-                      {status === 'On Hold' && <AlertCircle className="w-3 h-3" />}
-                      {status === 'Not Started' && <Clock className="w-3 h-3" />}
+                      {status === 'In Progress' && <PlayCircle className="w-2.5 h-2.5" />}
+                      {status === 'On Hold' && <AlertCircle className="w-2.5 h-2.5" />}
+                      {status === 'Not Started' && <Clock className="w-2.5 h-2.5" />}
                       <span>{status}</span>
                     </Badge>
                   </td>
-                  <td className="px-2 py-1 text-text-secondary">
-                    <div className="flex flex-col text-[10px] leading-tight">
-                      <span>{startDate}</span>
-                      <span className="text-text-muted opacity-70">to {endDate}</span>
-                    </div>
+                  <td className="px-2 py-1 text-text-secondary truncate text-[11px]">
+                    {startDate}
+                  </td>
+                  <td className="px-2 py-1 text-text-secondary truncate text-[11px]">
+                    {endDate}
                   </td>
                   <td className="px-2 py-1 text-right font-mono font-semibold text-text-primary text-[11px]">
                     ₹{formattedBudget}

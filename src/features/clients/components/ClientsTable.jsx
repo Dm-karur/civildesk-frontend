@@ -170,9 +170,9 @@ export function ClientsTable({
     return (
       <Badge 
         variant={statusConfig.variant}
-        className="text-[9px] font-bold uppercase tracking-wider h-5 px-1.5 inline-flex items-center gap-1 leading-none font-sans"
+        className="text-[8px] font-bold uppercase tracking-wider h-4 px-1.5 inline-flex items-center gap-0.5 leading-none font-sans"
       >
-        <StatusIcon className="w-3 h-3" />
+        <StatusIcon className="w-2.5 h-2.5" />
         <span>{statusConfig.label}</span>
       </Badge>
     );
@@ -197,11 +197,11 @@ export function ClientsTable({
             <tr>
               <th className="px-2 py-1.5 w-10 text-center">#</th>
               <th className="px-2 py-1.5 w-24">Client Code</th>
-              <th className="px-2 py-1.5 w-44">Client Name</th>
-              <th className="px-2 py-1.5 w-28">Industry</th>
-              <th className="px-2 py-1.5 w-32">GSTIN / PAN</th>
-              <th className="px-2 py-1.5 w-36">Contact Details</th>
-              <th className="px-2 py-1.5 text-right w-28">Credit Limit (₹)</th>
+              <th className="px-2 py-1.5 w-48">Client Name</th>
+              <th className="px-2 py-1.5 w-32">Client Type</th>
+              <th className="px-2 py-1.5 w-40">Email</th>
+              <th className="px-2 py-1.5 w-28">Phone</th>
+              <th className="px-2 py-1.5 w-32">City</th>
               <th className="px-2 py-1.5 w-24 text-center">Status</th>
               <th className="px-2 py-1.5 text-center w-20">Actions</th>
             </tr>
@@ -223,14 +223,10 @@ export function ClientsTable({
               filteredClients.map((client, index) => {
                 const code = client.client_code || '—';
                 const name = client.client_name || client.name || '—';
-                const legal = client.legal_name;
-                const industry = client.industry_type || '—';
-                const gstin = client.gstin;
-                const pan = client.pan;
-                const email = client.email;
-                const phone = client.phone;
-                const credit = client.credit_limit !== undefined && client.credit_limit !== null ? Number(client.credit_limit).toLocaleString('en-IN') : '0.00';
-                const terms = client.payment_terms_days !== undefined && client.payment_terms_days !== null ? `${client.payment_terms_days}d` : '0d';
+                const type = client.client_type || client.industry_type || '—';
+                const email = client.email || '—';
+                const phone = client.phone || client.contact || '—';
+                const city = client.city || '—';
 
                 const isMenuOpen = openMenuId === client.id;
 
@@ -238,33 +234,20 @@ export function ClientsTable({
                   <tr key={client.id || index} className="hover:bg-surface-muted/30 transition-colors group relative">
                     <td className="px-2 py-1 text-center font-medium text-text-primary text-[11px]">{index + 1}</td>
                     <td className="px-2 py-1 font-mono font-semibold text-text-primary text-[11px]">{code}</td>
-                    <td className="px-2 py-1 font-medium text-text-primary truncate" title={legal ? `${name} (${legal})` : name}>
-                      <div className="flex flex-col leading-tight">
-                        <span className="truncate">{name}</span>
-                        {legal && <span className="text-[10px] text-text-muted truncate font-normal">{legal}</span>}
-                      </div>
+                    <td className="px-2 py-1 font-medium text-text-primary truncate" title={name}>
+                      {name}
                     </td>
-                    <td className="px-2 py-1 text-text-secondary truncate text-[11px]" title={industry}>
-                      {industry}
+                    <td className="px-2 py-1 text-text-secondary truncate text-[11px]" title={type}>
+                      {type}
                     </td>
-                    <td className="px-2 py-1 text-text-secondary">
-                      <div className="flex flex-col text-[10px] font-mono leading-tight">
-                        <span className="truncate">{gstin || '—'}</span>
-                        {pan && <span className="text-text-muted opacity-80 truncate">PAN: {pan}</span>}
-                      </div>
+                    <td className="px-2 py-1 text-text-secondary truncate text-[11px]" title={email}>
+                      {email}
                     </td>
-                    <td className="px-2 py-1 text-text-secondary">
-                      <div className="flex flex-col text-[10px] leading-tight">
-                        {email && <span className="truncate text-text-primary" title={email}>{email}</span>}
-                        {phone && <span className="text-text-muted truncate">{phone}</span>}
-                        {!email && !phone && <span>—</span>}
-                      </div>
+                    <td className="px-2 py-1 text-text-secondary truncate text-[11px]">
+                      {phone}
                     </td>
-                    <td className="px-2 py-1 text-right text-text-secondary">
-                      <div className="flex flex-col text-[11px] leading-tight font-mono">
-                        <span className="font-semibold text-text-primary">₹{credit}</span>
-                        <span className="text-[9px] text-text-muted">Net {terms}</span>
-                      </div>
+                    <td className="px-2 py-1 text-text-secondary truncate text-[11px]" title={city}>
+                      {city}
                     </td>
                     <td className="px-2 py-1 text-center">
                       {getStatusBadge(client)}

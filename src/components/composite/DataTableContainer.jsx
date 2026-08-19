@@ -1,20 +1,20 @@
 import { cn } from '../../utils/cn';
 
-export function DataTableContainer({ 
-  toolbar, 
-  children, 
-  pagination, 
-  loading = false, 
+export function DataTableContainer({
+  toolbar,
+  children,
+  pagination,
+  loading = false,
   empty = false,
   error = false,
   emptyState,
   errorState,
-  className 
+  className
 }) {
   return (
     <div className={cn("flex flex-col w-full", className)}>
       {toolbar && <div className="mb-4">{toolbar}</div>}
-      
+
       <div className="bg-surface border border-border rounded-lg shadow-1 overflow-hidden">
         <div className="overflow-x-auto min-h-[300px] relative">
           {error ? (
@@ -39,7 +39,7 @@ export function DataTableContainer({
             </>
           )}
         </div>
-        
+
         {pagination && !error && !empty && (
           <div className="border-t border-border px-4 py-3 bg-surface">
             {pagination}

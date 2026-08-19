@@ -148,20 +148,20 @@ export function LoginPage() {
       </div>
 
       {/* Right Panel */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 lg:p-24 relative z-10 bg-surface md:bg-[#F8F9FC] h-full">
-        <div className="w-full max-w-[440px] flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 md:p-12 lg:p-24 relative z-10 bg-[#F8F9FC] h-full overflow-y-auto">
+        <div className="w-full max-w-[440px] flex flex-col py-8">
           {/* Mobile Logo (only visible on mobile) */}
-          <div className="flex lg:hidden items-center justify-center gap-2 mb-8">
+          <div className="flex lg:hidden items-center justify-center gap-2 mb-8 flex-shrink-0">
             <Building2 className="w-8 h-8 text-primary" />
-            <span className="text-2xl font-bold text-secondary tracking-tight">Civil Desk</span>
+            <span className="text-2xl font-bold text-[#172033] tracking-tight">Civil Desk</span>
           </div>
 
-          <div className="bg-surface rounded-2xl md:p-10 shadow-level-1 md:shadow-level-2 md:border border-border w-full">
-            <div className="text-center mb-10">
-              <h2 className="text-[28px] font-bold text-[#172033] mb-2">Welcome Back!</h2>
-              <p className="text-[#535D6D] text-[15px]">Sign in to your Civil Desk account</p>
+          <div className="bg-surface rounded-2xl p-6 sm:p-8 md:p-10 shadow-sm border border-border w-full flex-shrink-0">
+            <div className="text-center mb-8">
+              <h2 className="text-[24px] sm:text-[28px] font-bold text-[#172033] mb-2">Welcome Back!</h2>
+              <p className="text-[#535D6D] text-[14px] sm:text-[15px]">Sign in to your Civil Desk account</p>
             </div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5 sm:gap-6">
 
               <FormField label="Username or Email" error={errors.identifier} htmlFor="identifier">
                 <Input

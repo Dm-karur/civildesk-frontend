@@ -146,11 +146,13 @@ export function UsersTable({
           <thead className="bg-surface-muted text-text-secondary text-[11px] uppercase font-semibold border-b border-border tracking-wider">
             <tr>
               <th className="px-2 py-1.5 w-10 text-center">#</th>
-              <th className="px-2 py-1.5 w-24">Emp Code</th>
-              <th className="px-2 py-1.5 w-44">Name & Username</th>
+              <th className="px-2 py-1.5 w-24">Employee Code</th>
+              <th className="px-2 py-1.5 w-40">Name</th>
+              <th className="px-2 py-1.5 w-32">Username</th>
               <th className="px-2 py-1.5 w-32">Designation</th>
-              <th className="px-2 py-1.5 w-40">Contact Details</th>
-              <th className="px-2 py-1.5 w-32">Last Login / Activity</th>
+              <th className="px-2 py-1.5 w-44">Email</th>
+              <th className="px-2 py-1.5 w-28">Phone</th>
+              <th className="px-2 py-1.5 w-28">Last Login</th>
               <th className="px-2 py-1.5 w-20 text-center">Status</th>
               <th className="px-2 py-1.5 text-center w-20">Actions</th>
             </tr>
@@ -158,13 +160,13 @@ export function UsersTable({
           <tbody className="divide-y divide-border">
             {loading ? (
               <tr>
-                <td colSpan="8" className="text-center py-6 text-text-muted text-[12px]">
+                <td colSpan="10" className="text-center py-6 text-text-muted text-[12px]">
                   Loading users from database...
                 </td>
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan="8" className="text-center py-6 text-text-muted text-[12px]">
+                <td colSpan="10" className="text-center py-6 text-text-muted text-[12px]">
                   No users found in database.
                 </td>
               </tr>
@@ -186,32 +188,26 @@ export function UsersTable({
                   <tr key={userObj.id || index} className="hover:bg-surface-muted/30 transition-colors group relative">
                     <td className="px-2 py-1 text-center font-medium text-text-primary text-[11px]">{index + 1}</td>
                     <td className="px-2 py-1 font-mono font-semibold text-text-primary text-[11px]">{empCode}</td>
-                    <td className="px-2 py-1 font-medium text-text-primary truncate" title={`${fullName} (@${username})`}>
+                    <td className="px-2 py-1 font-medium text-text-primary truncate" title={fullName}>
                       <div className="flex items-center gap-1.5">
-                        <div className="flex flex-col leading-tight truncate">
-                          <div className="flex items-center gap-1">
-                            <span className="truncate">{fullName}</span>
-                            {isSuper && <Crown className="w-2.5 h-2.5 text-amber-500 shrink-0" title="Super Admin" />}
-                          </div>
-                          <span className="text-[10px] text-text-muted truncate font-normal font-mono">@{username}</span>
-                        </div>
+                        <span className="truncate">{fullName}</span>
+                        {isSuper && <Crown className="w-2.5 h-2.5 text-amber-500 shrink-0" title="Super Admin" />}
                       </div>
+                    </td>
+                    <td className="px-2 py-1 text-text-secondary truncate text-[11px] font-mono">
+                      {username !== '—' ? `@${username}` : '—'}
                     </td>
                     <td className="px-2 py-1 text-text-secondary truncate text-[11px]" title={designation}>
                       {designation}
                     </td>
-                    <td className="px-2 py-1 text-text-secondary">
-                      <div className="flex flex-col text-[10px] leading-tight">
-                        {email && <span className="truncate text-text-primary font-medium" title={email}>{email}</span>}
-                        {phone && <span className="text-text-muted truncate">{phone}</span>}
-                        {!email && !phone && <span>—</span>}
-                      </div>
+                    <td className="px-2 py-1 text-text-secondary truncate text-[11px]" title={email}>
+                      {email || '—'}
                     </td>
-                    <td className="px-2 py-1 text-text-secondary">
-                      <div className="flex flex-col text-[10px] leading-tight">
-                        <span className="font-medium text-text-primary">{lastLogin}</span>
-                        <span className="text-text-muted font-mono">{lastIp !== '—' ? `IP: ${lastIp}` : 'No IP logged'}</span>
-                      </div>
+                    <td className="px-2 py-1 text-text-secondary truncate text-[11px]">
+                      {phone || '—'}
+                    </td>
+                    <td className="px-2 py-1 text-text-secondary truncate text-[11px]">
+                      <span className="font-medium text-text-primary">{lastLogin}</span>
                     </td>
                     <td className="px-2 py-1 text-center">
                       <Badge 

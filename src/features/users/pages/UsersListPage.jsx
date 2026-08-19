@@ -19,7 +19,7 @@ export function UsersListPage() {
           { label: 'Users' }
         ]}
       />
-      <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex flex-col h-full">
         <UsersFilterBar 
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}

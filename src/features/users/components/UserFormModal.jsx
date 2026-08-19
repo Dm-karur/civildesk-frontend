@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
-import { User, Save, X, Loader2, Key, Shield, ShieldCheck, Building2, UserCheck } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
+import { User } from 'lucide-react';
+import { Input } from '../../../components/ui/Input';
+import { Select } from '../../../components/ui/Select';
+import { Checkbox } from '../../../components/ui/Checkbox';
+import { FormField } from '../../../components/composite/FormField';
+import { EntityEditModal } from '../../../components/composite/EntityEditModal';
+import { EmailInput } from '../../../components/ui/fields/EmailInput';
+import { PhoneInput } from '../../../components/ui/fields/PhoneInput';
+import { PasswordInput } from '../../../components/ui/fields/PasswordInput';
 import { 
   usersApi, 
   branchesApi, 
@@ -11,6 +18,7 @@ import {
   userStatusesApi 
 } from '../../../api/apiservice';
 import { toast } from '../../../components/composite/Toast';
+import { validators } from '../../../utils/validation';
 
 function extractBranchList(response) {
   if (!response) return [];
@@ -64,6 +72,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
     { id: 4, status_name: 'Pending Activation' }
   ]);
 
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     employee_code: '',
     username: '',
@@ -130,7 +139,7 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (user && isOpen) {
       setFormData({
         employee_code: user.employee_code || '',
         username: user.username || '',
@@ -150,7 +159,8 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
         must_change_password: user.must_change_password ? 1 : 0,
         company_id: user.company_id || '1'
       });
-    } else {
+      setErrors({});
+    } else if (isOpen) {
       setFormData({
         employee_code: '',
         username: '',
@@ -170,13 +180,40 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
         must_change_password: 0,
         company_id: '1'
       });
+      setErrors({});
     }
   }, [user, isOpen]);
 
-  if (!isOpen) return null;
+  const validateField = (name, value) => {
+    let error = null;
+    switch (name) {
+      case 'username':
+      case 'first_name':
+        error = validators.required(value);
+        break;
+      case 'email':
+        error = validators.email(value);
+        break;
+      case 'phone':
+        error = validators.phone(value);
+        break;
+      case 'password':
+        if (!isEditing && !value) {
+          error = "Password is required for new users.";
+        } else if (value) {
+          error = validators.password(value);
+        }
+        break;
+      default:
+        break;
+    }
+    setErrors(prev => ({ ...prev, [name]: error }));
+    return error;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
     if (name === 'is_super_admin') {
       const isSuper = checked ? 1 : 0;
       setFormData(prev => ({
@@ -188,14 +225,42 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
       return;
     }
 
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (checked ? 1 : 0) : value
-    }));
+    const finalValue = type === 'checkbox' ? (checked ? 1 : 0) : value;
+    setFormData(prev => ({ ...prev, [name]: finalValue }));
+
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    validateField(name, value);
+  };
+
+  const handleSelectChange = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.username = validateField('username', formData.username);
+    newErrors.first_name = validateField('first_name', formData.first_name);
+    newErrors.email = validateField('email', formData.email);
+    newErrors.phone = validateField('phone', formData.phone);
+    newErrors.password = validateField('password', formData.password);
+
+    const hasErrors = Object.values(newErrors).some(err => err !== null);
+    return !hasErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      toast.error('Please fix the validation errors before saving.');
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -262,318 +327,198 @@ export function UserFormModal({ user, isOpen, onClose, onSaveSuccess }) {
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-surface border border-border rounded-sm shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-surface-muted/60">
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-primary" />
-            <h3 className="text-[13px] font-bold text-text-primary">
-              {isEditing ? `Edit User: ${user.first_name || user.username}` : 'Add New User'}
-            </h3>
-            {isEditing && (
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                formData.is_active === 1 
-                  ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
-                  : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
-              }`}>
-                {formData.is_active === 1 ? 'Active User' : 'Inactive User'}
-              </span>
-            )}
-          </div>
-          <button onClick={onClose} className="text-text-secondary hover:text-text-primary p-1">
-            <X className="w-4 h-4" />
+    <EntityEditModal isOpen={isOpen} onClose={onClose}>
+      <EntityEditModal.Header 
+        icon={User}
+        title={isEditing ? `Edit User: ${user.first_name || user.username}` : 'Add New User'}
+        subtitle="Manage user profile, access level, and role assignments."
+        onClose={onClose}
+      />
+
+      {formData.is_active === 0 && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-[11px] text-amber-700 dark:text-amber-400 flex items-center justify-between">
+          <span>⚠️ <strong>Account Inactive:</strong> This user cannot log in or make updates while inactive.</span>
+          <button 
+            type="button" 
+            onClick={() => setFormData(prev => ({ ...prev, is_active: 1, user_status_id: '1' }))}
+            className="text-[10px] font-bold underline hover:no-underline ml-2"
+          >
+            Reactivate Now
           </button>
         </div>
+      )}
 
-        {/* Inactive Account Banner */}
-        {formData.is_active === 0 && (
-          <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-[11px] text-amber-700 dark:text-amber-400 flex items-center justify-between">
-            <span>⚠️ <strong>Account Inactive:</strong> This user cannot log in or make updates while inactive.</span>
-            <button 
-              type="button" 
-              onClick={() => setFormData(prev => ({ ...prev, is_active: 1, user_status_id: '1' }))}
-              className="text-[10px] font-bold underline hover:no-underline ml-2"
-            >
-              Reactivate Now
-            </button>
-          </div>
-        )}
-
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-4 text-[11px] space-y-3.5 max-h-[80vh] overflow-y-auto">
-          {/* Section 1: User Account & Identity */}
-          <div>
-            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
-              <User className="w-3 h-3 text-primary" />
-              <span>1. User Account & Identity</span>
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Employee Code</label>
-                <input 
-                  type="text"
+      <form id="user-edit-form" onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col min-h-0">
+        <EntityEditModal.Body>
+          <EntityEditModal.Section title="User Account & Identity">
+            <EntityEditModal.Grid>
+              <FormField label="Employee Code">
+                <Input 
                   name="employee_code"
                   value={formData.employee_code}
                   onChange={handleChange}
                   placeholder="e.g. EMP-001"
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-mono focus:outline-none focus:border-focus"
                 />
-              </div>
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Username *</label>
-                <input 
-                  type="text"
+              </FormField>
+              <FormField label="Username" required error={errors.username}>
+                <Input 
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   placeholder="e.g. john.doe"
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-mono focus:outline-none focus:border-focus"
-                  required
                 />
-              </div>
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">First Name *</label>
-                <input 
-                  type="text"
+              </FormField>
+              <FormField label="First Name" required error={errors.first_name}>
+                <Input 
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   placeholder="e.g. John"
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
-                  required
                 />
-              </div>
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Last Name</label>
-                <input 
-                  type="text"
+              </FormField>
+              <FormField label="Last Name">
+                <Input 
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleChange}
                   placeholder="e.g. Doe"
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
                 />
-              </div>
-            </div>
-          </div>
+              </FormField>
+            </EntityEditModal.Grid>
+          </EntityEditModal.Section>
 
-          {/* Section 2: Contact, Designation & Type */}
-          <div>
-            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
-              <UserCheck className="w-3 h-3 text-primary" />
-              <span>2. Contact & Classification</span>
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Email Address *</label>
-                <input 
-                  type="email"
+          <EntityEditModal.Section title="Contact & Classification">
+            <EntityEditModal.Grid>
+              <FormField label="Email Address" required error={errors.email}>
+                <EmailInput 
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="john.doe@company.com"
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
-                  required
+                  onBlur={handleBlur}
                 />
-              </div>
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Phone Number</label>
-                <input 
-                  type="text"
+              </FormField>
+              <FormField label="Phone Number" error={errors.phone}>
+                <PhoneInput 
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="+91-9876543210"
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
+                  onBlur={handleBlur}
                 />
-              </div>
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Designation</label>
-                <input 
-                  type="text"
+              </FormField>
+              <FormField label="Designation">
+                <Input 
                   name="designation"
                   value={formData.designation}
                   onChange={handleChange}
-                  placeholder="e.g. Project Manager, Site Engineer"
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
+                  placeholder="e.g. Site Engineer"
+                />
+              </FormField>
+              <FormField label="User Type">
+                <Select
+                  options={userTypes.map(ut => ({
+                    value: String(ut.id),
+                    label: ut.type_name || ut.user_type_name || ut.name || ut.type_code || ut.user_type || ut.title || `Type #${ut.id}`
+                  }))}
+                  value={String(formData.user_type_id)}
+                  onChange={(val) => handleSelectChange('user_type_id', val)}
+                />
+              </FormField>
+            </EntityEditModal.Grid>
+          </EntityEditModal.Section>
+
+          <EntityEditModal.Section title="Branch & Access Level">
+            <EntityEditModal.Grid>
+              <FormField label="Default Branch">
+                <Select
+                  options={[
+                    { value: '', label: 'All Branches / Head Office' },
+                    ...branches.map(br => ({
+                      value: String(br.id),
+                      label: `${br.branch_name || br.name} (${br.branch_code || br.code})`
+                    }))
+                  ]}
+                  value={String(formData.default_branch_id)}
+                  onChange={(val) => handleSelectChange('default_branch_id', val)}
+                />
+              </FormField>
+              <FormField label="Access Level" required>
+                <Select
+                  options={accessLevels.map(al => ({
+                    value: String(al.id),
+                    label: al.level_name || al.name || `Access Level #${al.id}`
+                  }))}
+                  value={String(formData.access_level_id)}
+                  onChange={(val) => handleSelectChange('access_level_id', val)}
+                />
+              </FormField>
+            </EntityEditModal.Grid>
+          </EntityEditModal.Section>
+
+          <EntityEditModal.Section title="Role & Status">
+            <EntityEditModal.Grid>
+              <FormField label="Assigned User Role" required>
+                <Select
+                  options={roles.map(r => ({
+                    value: String(r.id),
+                    label: r.role_name || r.name
+                  }))}
+                  value={String(formData.role_id)}
+                  onChange={(val) => handleSelectChange('role_id', val)}
+                />
+              </FormField>
+              <FormField label="User Status" required>
+                <Select
+                  options={statuses.map(st => ({
+                    value: String(st.id),
+                    label: st.status_name || st.name || `Status #${st.id}`
+                  }))}
+                  value={String(formData.user_status_id)}
+                  onChange={(val) => handleSelectChange('user_status_id', val)}
+                />
+              </FormField>
+              <div className="md:col-span-2">
+                <FormField label={isEditing ? "New Password (optional)" : "Password"} required={!isEditing} error={errors.password}>
+                  <PasswordInput 
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder={isEditing ? "Leave blank to keep existing password" : "Enter secure password..."}
+                  />
+                </FormField>
+              </div>
+              <div className="md:col-span-2 flex items-center gap-6 mt-2">
+                <Checkbox 
+                  id="is_super_admin"
+                  name="is_super_admin"
+                  checked={formData.is_super_admin === 1}
+                  onChange={handleChange}
+                  label="Super Administrator Access"
+                />
+                <Checkbox 
+                  id="is_active"
+                  name="is_active"
+                  checked={formData.is_active === 1}
+                  onChange={handleChange}
+                  label="Account Active"
                 />
               </div>
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">User Type</label>
-                <select
-                  name="user_type_id"
-                  value={formData.user_type_id}
-                  onChange={handleChange}
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
-                >
-                  {userTypes.map(ut => {
-                    const label = ut.type_name || ut.user_type_name || ut.name || ut.type_code || ut.user_type || ut.title || `Type #${ut.id}`;
-                    return (
-                      <option key={ut.id} value={ut.id}>
-                        {label}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-            </div>
-          </div>
+            </EntityEditModal.Grid>
+          </EntityEditModal.Section>
+        </EntityEditModal.Body>
+      </form>
 
-          {/* Section 3: Branch Access & Level */}
-          <div>
-            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
-              <Building2 className="w-3 h-3 text-primary" />
-              <span>3. Branch & Access Level</span>
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Default Branch</label>
-                <select
-                  name="default_branch_id"
-                  value={formData.default_branch_id}
-                  onChange={handleChange}
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
-                >
-                  <option value="">All Branches / Head Office</option>
-                  {branches.map(br => (
-                    <option key={br.id} value={br.id}>
-                      {br.branch_name || br.name} ({br.branch_code || br.code})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
-                  Access Level *
-                </label>
-                <select
-                  name="access_level_id"
-                  value={formData.access_level_id}
-                  onChange={handleChange}
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-medium focus:outline-none focus:border-focus"
-                  required
-                >
-                  {accessLevels.map(al => (
-                    <option key={al.id} value={al.id}>
-                      {al.level_name || al.name || `Access Level #${al.id}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 4: Role & Status */}
-          <div>
-            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5 flex items-center gap-1">
-              <Shield className="w-3 h-3 text-primary" />
-              <span>4. Role & Status</span>
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
-                  Assigned User Role *
-                </label>
-                <select
-                  name="role_id"
-                  value={formData.role_id}
-                  onChange={handleChange}
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-medium focus:outline-none focus:border-focus"
-                  required
-                >
-                  {roles.map(r => (
-                    <option key={r.id} value={r.id}>
-                      {r.role_name || r.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">
-                  User Status *
-                </label>
-                <select
-                  name="user_status_id"
-                  value={formData.user_status_id}
-                  onChange={handleChange}
-                  className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-medium focus:outline-none focus:border-focus"
-                  required
-                >
-                  {statuses.map(st => (
-                    <option key={st.id} value={st.id}>
-                      {st.status_name || st.name || `Status #${st.id}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {!isEditing ? (
-                <div className="sm:col-span-2">
-                  <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">Password *</label>
-                  <input 
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Enter secure password..."
-                    className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
-                    required
-                  />
-                </div>
-              ) : (
-                <div className="sm:col-span-2">
-                  <label className="block text-[9px] uppercase font-bold text-text-secondary mb-1">New Password (optional)</label>
-                  <input 
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Leave blank to keep existing password"
-                    className="w-full h-7 px-2 border border-border rounded-xs bg-background text-[11px] focus:outline-none focus:border-focus"
-                  />
-                </div>
-              )}
-
-              <div className="flex items-center gap-4 sm:col-span-2 pt-1">
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    name="is_super_admin"
-                    checked={formData.is_super_admin === 1}
-                    onChange={handleChange}
-                    className="rounded-xs text-primary"
-                  />
-                  <span className="text-[10px] font-medium text-text-primary">Super Administrator Access</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    name="is_active"
-                    checked={formData.is_active === 1}
-                    onChange={handleChange}
-                    className="rounded-xs text-primary"
-                  />
-                  <span className="text-[10px] font-medium text-text-primary">Account Active</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
-            <Button type="button" variant="ghost" size="sm" onClick={onClose} className="h-7 text-[11px]">
-              Cancel
-            </Button>
-            <Button type="submit" size="sm" disabled={saving} className="h-7 text-[11px] gap-1">
-              {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
-              <span>{isEditing ? 'Update User' : 'Create User'}</span>
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+      <EntityEditModal.Footer 
+        onCancel={onClose} 
+        submitLabel={isEditing ? 'Update User' : 'Create User'}
+        formId="user-edit-form" 
+        isSubmitting={saving} 
+      />
+    </EntityEditModal>
   );
 }
