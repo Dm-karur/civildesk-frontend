@@ -148,8 +148,8 @@ export function LoginPage() {
       </div>
 
       {/* Right Panel */}
-      <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 md:p-12 lg:p-24 relative z-10 bg-[#F8F9FC] h-full overflow-y-auto">
-        <div className="w-full max-w-[440px] flex flex-col py-8">
+      <div className="flex-1 flex flex-col items-center justify-center p-0 sm:p-8 md:p-12 lg:p-24 relative z-10 bg-[#F8F9FC] h-full overflow-y-auto">
+        <div className="w-full max-w-[440px] px-4 sm:px-0 flex flex-col py-8">
           {/* Mobile Logo (only visible on mobile) */}
           <div className="flex lg:hidden items-center justify-center gap-2 mb-8 flex-shrink-0">
             <Building2 className="w-8 h-8 text-primary" />

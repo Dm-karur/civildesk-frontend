@@ -8,7 +8,7 @@ export function EntityDetailsModal({ isOpen, onClose, children }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-150">
-      <div className="bg-surface border border-border rounded-lg shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
+      <div className="bg-surface border border-border rounded-lg shadow-2xl w-[calc(100vw-2rem)] sm:w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
         {children}
       </div>
     </div>
@@ -123,9 +123,9 @@ function ContentBlock({ label, children }) {
 // Footer
 function Footer({ children, onClose }) {
   return (
-    <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-surface-muted/40">
+    <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 px-5 py-3 border-t border-border bg-surface-muted/40 w-full shrink-0">
       {children || (
-        <Button variant="outline" size="sm" onClick={onClose} className="h-8 px-4 text-[12px]">
+        <Button variant="outline" size="sm" onClick={onClose} className="h-10 sm:h-8 px-4 text-[12px] w-full sm:w-auto">
           Close
         </Button>
       )}

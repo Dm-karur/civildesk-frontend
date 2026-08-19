@@ -11,6 +11,7 @@ import {
 import { PageContainer, PageHeader } from '../../../components/layout';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
+import { Select } from '../../../components/ui/Select';
 import { rolesApi } from '../../../api/apiservice';
 import { PermissionsTable } from '../components/PermissionsTable';
 import { RolesListTable } from '../components/RolesListTable';
@@ -116,11 +117,11 @@ export function PermissionsPage() {
         ]}
       />
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 min-w-0">
         {/* Navigation & Controls Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-surface border border-border rounded-sm">
           {/* Tab buttons */}
-          <div className="flex items-center gap-1 bg-surface-muted p-0.5 rounded-xs border border-border">
+          <div className="flex flex-wrap items-center gap-1 bg-surface-muted p-0.5 rounded-xs border border-border w-full sm:w-auto">
             <button
               onClick={() => setActiveTab('matrix')}
               className={`flex items-center gap-1.5 px-3 py-1 text-[11px] font-semibold rounded-xs transition-colors cursor-pointer ${
@@ -146,21 +147,19 @@ export function PermissionsPage() {
           </div>
 
           {/* Right Action / Role Quick Selector */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
             {activeTab === 'matrix' && roles.length > 0 && (
               <div className="flex items-center gap-1.5">
-                <label className="text-[10px] uppercase font-bold text-text-secondary">Active Role:</label>
-                <select
+                <label className="text-[10px] uppercase font-bold text-text-secondary whitespace-nowrap">Active Role:</label>
+                <Select
                   value={selectedRoleId}
-                  onChange={(e) => setSelectedRoleId(e.target.value)}
-                  className="h-7 px-2 border border-border rounded-xs bg-background text-[11px] font-semibold text-text-primary focus:outline-none focus:border-focus cursor-pointer"
-                >
-                  {roles.map(r => (
-                    <option key={r.id} value={String(r.id)}>
-                      {r.role_name || r.name} ({r.role_code || `ROLE-${r.id}`})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setSelectedRoleId(val)}
+                  className="w-[180px] sm:w-[220px]"
+                  options={roles.map(r => ({
+                    value: String(r.id),
+                    label: `${r.role_name || r.name} (${r.role_code || `ROLE-${r.id}`})`
+                  }))}
+                />
               </div>
             )}
 

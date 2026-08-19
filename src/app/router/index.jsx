@@ -8,6 +8,7 @@ import { CompanyListPage } from '../../features/settings/pages/CompanyListPage';
 import { BranchListPage } from '../../features/settings/pages/BranchListPage';
 import { UsersListPage } from '../../features/users/pages/UsersListPage';
 import { PermissionsPage } from '../../features/permissions/pages/PermissionsPage';
+import { ApprovalWorkflowsPage } from '../../features/workflows/pages/ApprovalWorkflowsPage';
 import { AuthProvider } from '../../features/auth/context/AuthContext';
 import { ProtectedRoute } from '../../components/layout/ProtectedRoute';
 import { ErrorBoundary } from '../../components/layout/ErrorBoundary';
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
           {
             path: 'administration/roles-permissions',
             element: <PermissionsPage />,
+          },
+          {
+            path: 'administration/approval-workflows',
+            element: <ApprovalWorkflowsPage />,
           },
           // Redirects for legacy routes
           {

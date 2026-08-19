@@ -12,7 +12,7 @@ export function DataTableContainer({
   className
 }) {
   return (
-    <div className={cn("flex flex-col w-full", className)}>
+    <div className={cn("flex flex-col w-full min-w-0", className)}>
       {toolbar && <div className="mb-4">{toolbar}</div>}
 
       <div className="bg-surface border border-border rounded-lg shadow-1 overflow-hidden">

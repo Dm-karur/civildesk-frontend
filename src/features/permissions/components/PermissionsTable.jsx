@@ -172,10 +172,10 @@ export function PermissionsTable({ selectedRole, onSaveSuccess }) {
   const activeGranted = Object.values(permissions).filter(Boolean).length;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 min-w-0">
       {/* Action Header Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-surface border border-border rounded-xs">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 p-2.5 bg-surface border border-border rounded-xs">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-semibold text-text-primary">
             Permissions Matrix for: <span className="text-primary font-bold">{selectedRole.role_name || selectedRole.name}</span>
           </span>
@@ -184,7 +184,7 @@ export function PermissionsTable({ selectedRole, onSaveSuccess }) {
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto justify-start sm:justify-end">
           <Button variant="ghost" size="sm" onClick={selectAll} className="h-6 text-[10px] px-2">
             Select All
           </Button>

@@ -7,7 +7,7 @@ export function EntityEditModal({ isOpen, onClose, children }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-150">
-      <div className="bg-surface border border-border rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
+      <div className="bg-surface border border-border rounded-lg shadow-2xl w-[calc(100vw-2rem)] sm:w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-150">
         {children}
       </div>
     </div>
@@ -92,7 +92,7 @@ function Grid({ children, className = '' }) {
 // Footer
 function Footer({ children, onCancel, submitLabel = 'Save Changes', formId, isSubmitting = false }) {
   return (
-    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-surface shrink-0">
+    <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 px-6 py-4 border-t border-border bg-surface shrink-0 w-full">
       {children || (
         <>
           <Button 
@@ -100,7 +100,7 @@ function Footer({ children, onCancel, submitLabel = 'Save Changes', formId, isSu
             variant="outline" 
             onClick={onCancel} 
             disabled={isSubmitting} 
-            className="h-9 px-5"
+            className="h-10 sm:h-9 px-5 w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -109,7 +109,7 @@ function Footer({ children, onCancel, submitLabel = 'Save Changes', formId, isSu
             form={formId} 
             variant="primary" 
             disabled={isSubmitting} 
-            className="h-9 px-6"
+            className="h-10 sm:h-9 px-6 w-full sm:w-auto"
             isLoading={isSubmitting}
           >
             {isSubmitting ? 'Saving...' : submitLabel}

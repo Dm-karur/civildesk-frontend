@@ -530,7 +530,7 @@ export function Sidebar({ isMobileOpen, onCloseMobile }) {
       <div className="p-3 border-t border-[rgba(255,255,255,0.1)] flex-shrink-0 relative" ref={profileRef}>
         {/* Floating Profile Card */}
         {isProfileOpen && (
-          <div className="absolute bottom-full left-1.5 right-1.5 mb-2 bg-surface rounded-lg shadow-level-2 border border-border z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+          <div className="absolute bottom-full left-1.5 right-1.5 mb-2 bg-surface rounded-lg shadow-level-2 border border-border z-50 animate-in fade-in zoom-in-95 duration-200 max-h-[calc(100vh-5rem)] overflow-y-auto custom-scrollbar">
             {/* User Info Section */}
             <div className="p-4 flex flex-col gap-3">
               <div className="flex justify-center w-full mb-1">
