@@ -5,6 +5,7 @@ import { Button, Input, Checkbox } from '../../../components/ui';
 import { FormField } from '../../../components/composite/FormField';
 import { toast } from '../../../components/composite/Toast';
 import { useAuth } from '../context/AuthContext';
+import loginImage from '../../../assets/loginpageimage.jpg';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -88,7 +89,7 @@ export function LoginPage() {
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/src/assets/loginpageimage.jpg"
+            src={loginImage}
             alt="Construction Site"
             className="w-full h-full object-cover"
           />

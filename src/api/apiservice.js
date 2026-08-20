@@ -79,14 +79,14 @@ const nestedCrud = (baseForParent) => ({
 });
 
 export const authApi = {
-    login: (identifier, password, remember = false) => request.post('/auth/login', { 
-        email: identifier, 
-        username: identifier, 
-        identifier: identifier, 
-        identity: identifier, 
+    login: (identifier, password, remember = false) => request.post('/auth/login', {
+        email: identifier,
+        username: identifier,
+        identifier: identifier,
+        identity: identifier,
         login: identifier,
-        password, 
-        remember 
+        password,
+        remember
     }),
     me: () => request.get('/auth/me'),
     logout: () => request.post('/auth/logout'),
@@ -102,9 +102,6 @@ export const companiesApi = {
 export const branchesApi = {
     list: (params) => request.get('/branches', params),
     get: (id) => request.get(`/branches/${enc(id)}`),
-    create: (payload) => request.post('/branches', payload),
-    update: (id, payload) => request.patch(`/branches/${enc(id)}`, payload),
-    delete: (id) => request.delete(`/branches/${enc(id)}`),
 };
 export const usersApi = {
     list: (params) => request.get('/users', params),
