@@ -6,6 +6,7 @@ import { KpiCard } from '../../../components/composite/KpiCard';
 import { ProjectsFilterBar } from '../components/ProjectsFilterBar';
 import { ProjectsTable } from '../components/ProjectsTable';
 import { projectsApi } from '../../../api/apiservice';
+import { mockProjects } from '../data/mockData';
 
 export function ProjectsListPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,36 +18,47 @@ export function ProjectsListPage() {
     totalBudget: 0
   });
 
+  const computeMetrics = (list) => {
+    let budgetSum = 0;
+    let inProg = 0;
+    let hold = 0;
+    let notStart = 0;
+
+    list.forEach(p => {
+      let b = p.contract_value || p.estimated_cost || p.budget || 0;
+      if (typeof b === 'string') {
+        b = Number(b.replace(/,/g, ''));
+      }
+      if (!isNaN(b)) budgetSum += b;
+
+      const st = String(p.status_name || p.status || '').toLowerCase();
+      if (st.includes('progress') || st === '1') inProg++;
+      else if (st.includes('hold') || st === '2') hold++;
+      else notStart++;
+    });
+
+    setProjectsCount({
+      total: list.length,
+      inProgress: inProg,
+      onHold: hold,
+      notStarted: notStart,
+      totalBudget: budgetSum
+    });
+  };
+
   useEffect(() => {
     projectsApi.list()
       .then(res => {
         const list = Array.isArray(res) ? res : (res?.data || res?.projects || []);
-        if (Array.isArray(list)) {
-          let budgetSum = 0;
-          let inProg = 0;
-          let hold = 0;
-          let notStart = 0;
-
-          list.forEach(p => {
-            const b = Number(p.contract_value || p.estimated_cost || p.budget || 0);
-            if (!isNaN(b)) budgetSum += b;
-
-            const st = String(p.status_name || p.status || '').toLowerCase();
-            if (st.includes('progress') || st === '1') inProg++;
-            else if (st.includes('hold') || st === '2') hold++;
-            else notStart++;
-          });
-
-          setProjectsCount({
-            total: list.length,
-            inProgress: inProg,
-            onHold: hold,
-            notStarted: notStart,
-            totalBudget: budgetSum
-          });
+        if (Array.isArray(list) && list.length > 0) {
+          computeMetrics(list);
+        } else {
+          computeMetrics(mockProjects);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        computeMetrics(mockProjects);
+      });
   }, []);
 
   const breadcrumbs = [

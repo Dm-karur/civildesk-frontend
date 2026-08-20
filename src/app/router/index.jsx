@@ -3,6 +3,10 @@ import { AppShell } from '../../components/layout';
 import { DashboardPage } from '../../features/dashboard/pages/DashboardPage';
 import { LoginPage } from '../../features/auth/pages/LoginPage';
 import { ProjectsListPage } from '../../features/projects/pages/ProjectsListPage';
+import { ProjectTypesPage } from '../../features/projects/pages/ProjectTypesPage';
+import { ProjectStatusesPage } from '../../features/projects/pages/ProjectStatusesPage';
+import { FinancialYearsPage } from '../../features/projects/pages/FinancialYearsPage';
+import { WorkCategoriesPage } from '../../features/projects/pages/WorkCategoriesPage';
 import { ClientsListPage } from '../../features/clients/pages/ClientsListPage';
 import { CompanyListPage } from '../../features/settings/pages/CompanyListPage';
 import { BranchListPage } from '../../features/settings/pages/BranchListPage';
@@ -40,12 +44,76 @@ export const router = createBrowserRouter([
             element: <ProjectsListPage />,
           },
           {
-            path: 'project-masters/clients',
+            path: 'projects/register',
+            element: <ProjectsListPage />,
+          },
+          {
+            path: 'masters/project-types',
+            element: <ProjectTypesPage />,
+          },
+          {
+            path: 'masters/project-statuses',
+            element: <ProjectStatusesPage />,
+          },
+          {
+            path: 'masters/financial-years',
+            element: <FinancialYearsPage />,
+          },
+          {
+            path: 'masters/work-categories',
+            element: <WorkCategoriesPage />,
+          },
+          {
+            path: 'masters/clients',
             element: <ClientsListPage />,
           },
           {
+            path: 'projects/clients',
+            element: <Navigate to="/masters/clients" replace />,
+          },
+          {
+            path: 'project-masters/clients',
+            element: <Navigate to="/masters/clients" replace />,
+          },
+          {
             path: 'clients',
-            element: <Navigate to="/project-masters/clients" replace />,
+            element: <Navigate to="/masters/clients" replace />,
+          },
+          {
+            path: 'project-masters/types',
+            element: <Navigate to="/masters/project-types" replace />,
+          },
+          {
+            path: 'project-types',
+            element: <Navigate to="/masters/project-types" replace />,
+          },
+          {
+            path: 'project-masters/status',
+            element: <Navigate to="/masters/project-statuses" replace />,
+          },
+          {
+            path: 'project-statuses',
+            element: <Navigate to="/masters/project-statuses" replace />,
+          },
+          {
+            path: 'project-status',
+            element: <Navigate to="/masters/project-statuses" replace />,
+          },
+          {
+            path: 'project-masters/financial-year',
+            element: <Navigate to="/masters/financial-years" replace />,
+          },
+          {
+            path: 'financial-years',
+            element: <Navigate to="/masters/financial-years" replace />,
+          },
+          {
+            path: 'project-masters/work-categories',
+            element: <Navigate to="/masters/work-categories" replace />,
+          },
+          {
+            path: 'work-categories',
+            element: <Navigate to="/masters/work-categories" replace />,
           },
           {
             path: 'administration/companies',

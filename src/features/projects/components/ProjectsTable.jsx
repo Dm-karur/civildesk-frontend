@@ -5,6 +5,7 @@ import { Badge } from '../../../components/ui/Badge';
 import { DataTableContainer } from '../../../components/composite/DataTableContainer';
 import { Pagination } from '../../../components/composite/Pagination';
 import { projectsApi } from '../../../api/apiservice';
+import { mockProjects } from '../data/mockData';
 
 function extractProjectsList(response) {
   if (!response) return [];
@@ -31,10 +32,14 @@ export function ProjectsTable({ searchQuery = '', statusFilter = 'all', clientFi
       setLoading(true);
       const response = await projectsApi.list();
       const list = extractProjectsList(response);
-      setProjects(list);
+      if (Array.isArray(list) && list.length > 0) {
+        setProjects(list);
+      } else {
+        setProjects(mockProjects);
+      }
     } catch (error) {
-      console.error('[ProjectsTable] Failed to load projects:', error);
-      setProjects([]);
+      console.error('[ProjectsTable] Failed to load projects, using mock fallback:', error);
+      setProjects(mockProjects);
     } finally {
       setLoading(false);
     }
@@ -111,10 +116,14 @@ export function ProjectsTable({ searchQuery = '', statusFilter = 'all', clientFi
               const client = project.client_name || project.client || '—';
               const type = project.project_type || project.type || '—';
               const status = project.status_name || project.status || 'Active';
-              const startDate = project.start_date ? project.start_date.split(' ')[0] : '—';
-              const endDate = project.end_date ? project.end_date.split(' ')[0] : '—';
-              const budget = project.contract_value || project.estimated_cost || project.budget;
-              const formattedBudget = budget !== undefined && budget !== null ? Number(budget).toLocaleString('en-IN') : '0.00';
+              const startDate = project.start_date ? project.start_date.split(' ')[0] : (project.startDate || '—');
+              const endDate = project.end_date ? project.end_date.split(' ')[0] : (project.endDate || '—');
+              const rawBudget = project.contract_value || project.estimated_cost || project.budget;
+              const formattedBudget = typeof rawBudget === 'string' && rawBudget.includes(',')
+                ? rawBudget
+                : (rawBudget !== undefined && rawBudget !== null && !isNaN(Number(rawBudget)))
+                  ? Number(rawBudget).toLocaleString('en-IN')
+                  : '0.00';
 
               return (
                 <tr key={project.id || index} className="hover:bg-surface-muted/30 transition-colors group">
